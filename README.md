@@ -142,11 +142,44 @@ eines Wappens.
 Nach einem erneuten Lauf muss der Inhalt von `team-logos.json` wieder in den
 `sst-logos`-Block der HTML-Datei kopiert werden.
 
+## Wo die App läuft
+
+Es gibt nur eine `index.html`. Sie erkennt beim Start selbst, wo sie läuft: erst
+`claude.use("artifact")`, sonst `/api/state`, sonst schreibgeschützt. Kein Build, keine Varianten.
+
+| | Speicher | Zweck |
+|---|---|---|
+| **Artifact** (claude.ai) | die Seite veröffentlicht sich selbst als neue Version | der bisherige Arbeitsweg |
+| **Vercel** | gemeinsamer Redis-Store hinter `/api/state` | eigene Adresse, beide Hosts, Passwortschutz |
+| **GitHub Pages** | keiner | Schaufenster, schreibgeschützt |
+
+### Einrichtung auf Vercel
+
+1. Repo unter [vercel.com/new](https://vercel.com/new) importieren. Framework **Other**, kein Build-Befehl.
+2. Im Projekt unter **Storage** einen Redis-Store anlegen und mit dem Projekt verbinden
+   (Upstash im Marketplace, Gratis-Kontingent). Vercel setzt dabei `KV_REST_API_URL` und
+   `KV_REST_API_TOKEN` automatisch.
+3. Unter **Settings → Environment Variables** `SST_KEY` setzen — das gemeinsame Passwort für
+   Adi und Fabio. Ohne diese Variable antwortet die API bewusst mit 503, statt offen zu stehen.
+4. Neu deployen. Beim ersten Aufruf fragt die Seite nach dem Passwort und merkt es sich im Browser.
+
+Der Zustand liegt in den Redis-Schlüsseln `sst:state` und `sst:version`. Geschrieben wird per
+Vergleiche-und-Setze: Wer mit einer veralteten Version speichert, bekommt 409, sieht einen Hinweis
+und lädt den neuen Stand — sein Entwurf bleibt lokal erhalten. Alle 15 Sekunden fragt die Seite
+nach, ob der andere Host etwas gespeichert hat, aber nur, wenn gerade nichts Offenes ungesichert ist.
+
+### GitHub Pages
+
+Pages hostet nur statische Dateien, ein `/api/state` gibt es dort nicht. Die Seite läuft, zeigt
+aber dauerhaft „Schreibgeschützte Ansicht". Als Vorschau taugt das, zum Ranken nicht. Wer sie
+doch schreibfähig will, hängt ein `<meta name="sst-api" content="https://…vercel.app">` in die
+`index.html` — die API erlaubt Cross-Origin-Zugriffe und prüft ohnehin das Passwort.
+
 ## Quelle
 
-`stammtischtrainer-ranking.html` ist die einzige Quelldatei. Die Seite speichert ihren
-Zustand, indem sie sich selbst als neue Artifact-Version veröffentlicht — der Zustand
-liegt als JSON im `<script id="sst-state">`-Block der publizierten Seite.
+Im Artifact speichert die Seite ihren Zustand, indem sie sich selbst als neue Version
+veröffentlicht — er liegt dann als JSON im `<script id="sst-state">`-Block der publizierten
+Seite. Auf Vercel liegt derselbe Zustand stattdessen im Redis-Store.
 
 Änderungen an der Datei werden über einen erneuten Artifact-Publish auf **dieselbe URL**
 ausgerollt. Achtung: Ein Publish von aussen überschreibt den gespeicherten Zustand mit

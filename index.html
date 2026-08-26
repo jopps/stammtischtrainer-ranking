@@ -403,6 +403,15 @@ pre.code{background:var(--panel-2);border:1px solid var(--line);border-radius:va
 .mtxt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .row .nm>span,.prow .nm>span,.crow .nm>span{display:flex;align-items:center;gap:5px}
 .ac li .tm{display:flex;align-items:center;gap:5px}
+.gate{display:grid;place-items:center;min-height:78vh;padding:24px 0}
+.gatebox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);
+  padding:30px 28px;max-width:400px;width:100%;text-align:center}
+.gatebox h1{font-size:31px;text-transform:uppercase;margin-top:16px}
+.gatebox p{color:var(--ink-2);font-size:14px;margin-top:9px}
+.gatebox form{display:flex;gap:8px;margin-top:20px}
+.gatebox input{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:99px;
+  padding:9px 16px;font-size:14px}
+.gatebox input:focus{outline:none;border-color:var(--ink-3)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 <div id="app"></div>
@@ -742,7 +751,18 @@ function rankingsOf(edId){ return (STATE.rankings&&STATE.rankings[edId])||{}; }
 var artifactNS=null;      // Capability-Namespace, sobald aufgelöst
 var writeState='pending'; // 'pending' | 'ready' | 'readonly'
 var saving=false;
-var leaving=false;  // nach erfolgreichem publish lädt die Ansicht neu
+var leaving=false;        // nach erfolgreichem publish lädt die Ansicht neu
+
+/* Wo der Zustand liegt. 'artifact' = die Seite speichert sich selbst (claude.ai),
+   'api' = gemeinsamer Speicher hinter /api/state (Vercel), 'readonly' = weder
+   noch, etwa auf einem rein statischen Host. */
+var BACKEND='pending';
+var API_BASE=(function(){
+  var m=document.querySelector('meta[name="sst-api"]');
+  return (m&&m.content||'').replace(/\/$/,'');
+})();
+var apiVersion=0, apiKey=null, apiNeedsKey=false, apiSetupMsg='', pollTimer=null;
+try{ apiKey=localStorage.getItem('sst:key')||null; }catch(e){}
 
 /* Erzeugt die vollständige Seite neu — Quelle sind die eigenen
    <style>- und <script>-Blöcke, nie das gerenderte DOM. */
@@ -779,46 +799,144 @@ function restoreUI(){
    Ansicht neu — deshalb ist das Speichern immer die letzte Aktion. */
 function commit(next,successMsg){
   if(saving) return Promise.resolve(false);
-  if(writeState==='readonly'){
+  if(BACKEND==='readonly'||writeState==='readonly'){
     toast('Diese Ansicht ist schreibgeschützt — nichts gespeichert.',true);
     return Promise.resolve(false);
   }
   saving=true; render();
   stashUI();
-  var p = artifactNS ? Promise.resolve(artifactNS) : claudeUse();
-  return p.then(function(ns){
-    if(!ns){ writeState='readonly'; throw {code:'not_granted'}; }
-    artifactNS=ns; writeState='ready';
-    return ns.publish(buildDoc(next));
-  }).then(function(){
-    STATE=next; leaving=true;
-    POOLEDIT=null; poolDraftDrop();   /* Arbeitskopie ist eingeflossen */
+  var work = BACKEND==='api' ? apiSave(next) : artifactSave(next);
+  return work.then(function(){
+    STATE=next;
+    if(BACKEND==='artifact') leaving=true;   /* der Shell lädt die Ansicht neu */
+    POOLEDIT=null; poolDraftDrop();          /* Arbeitskopie ist eingeflossen */
     toast(successMsg||'Gespeichert');
     saving=false; render();
     return true;
   }).catch(function(err){
     saving=false;
-    var code=(err&&err.code)||'upstream_error';
-    if(code==='conflict'){
-      toast('Jemand anderes hat gerade gespeichert. Die Seite lädt neu — dein Entwurf bleibt erhalten.',true);
-    }else if(code==='not_granted'||code==='not_writer'||code==='consent_required'||code==='capability_disabled'||code==='not_declared'){
-      writeState='readonly';
-      toast('Diese Ansicht darf nicht speichern. Änderungen bleiben nur im Browser.',true);
-    }else if(code==='too_large'){
-      toast('Zu viele Daten für eine Version. Spielerliste kürzen.',true);
-    }else if(code==='rate_limited'){
-      toast('Zu schnell gespeichert. Kurz warten und nochmals versuchen.',true);
-    }else{
-      toast('Speichern fehlgeschlagen. Nochmals versuchen.',true);
-    }
+    handleSaveError((err&&err.code)||'upstream_error');
     render();
     return false;
   });
 }
 
+function artifactSave(next){
+  var p = artifactNS ? Promise.resolve(artifactNS) : claudeUse();
+  return p.then(function(ns){
+    if(!ns){ writeState='readonly'; throw {code:'not_granted'}; }
+    artifactNS=ns; writeState='ready';
+    return ns.publish(buildDoc(next));
+  });
+}
+
+function handleSaveError(code){
+  if(code==='conflict'){
+    if(BACKEND==='api'){
+      toast('Der andere Host hat zuerst gespeichert. Der neue Stand wird geladen — dein Entwurf bleibt erhalten.',true);
+      apiReload();
+    }else{
+      toast('Jemand anderes hat gerade gespeichert. Die Seite lädt neu — dein Entwurf bleibt erhalten.',true);
+    }
+  }else if(code==='auth'){
+    apiNeedsKey=true;
+    toast('Passwort abgelehnt. Bitte neu eingeben.',true);
+  }else if(code==='setup'){
+    toast(apiSetupMsg||'Der Speicher ist auf dem Server noch nicht eingerichtet.',true);
+  }else if(code==='not_granted'||code==='not_writer'||code==='consent_required'||code==='capability_disabled'||code==='not_declared'){
+    writeState='readonly'; BACKEND='readonly';
+    toast('Diese Ansicht darf nicht speichern. Änderungen bleiben nur im Browser.',true);
+  }else if(code==='too_large'){
+    toast('Zu viele Daten für einen Stand. Spielerliste kürzen.',true);
+  }else if(code==='rate_limited'){
+    toast('Zu schnell gespeichert. Kurz warten und nochmals versuchen.',true);
+  }else{
+    toast('Speichern fehlgeschlagen. Nochmals versuchen.',true);
+  }
+}
+
 function claudeUse(){
   if(!window.claude||typeof window.claude.use!=='function') return Promise.resolve(null);
   return window.claude.use('artifact').catch(function(){return null;});
+}
+
+/* ---------- gemeinsamer Speicher hinter /api/state ---------- */
+function apiFetch(opts){
+  var h={'content-type':'application/json'};
+  if(apiKey) h['x-sst-key']=apiKey;
+  var cfg={headers:h,cache:'no-store'};
+  if(opts) for(var k in opts) cfg[k]=opts[k];
+  return fetch(API_BASE+'/api/state',cfg).then(function(r){
+    return r.text().then(function(t){
+      var j=null; try{ j=JSON.parse(t); }catch(e){}
+      return {status:r.status,ok:r.ok,json:j};
+    });
+  });
+}
+function codeForStatus(r){
+  if(r.status===409) return 'conflict';
+  if(r.status===401) return 'auth';
+  if(r.status===503) return 'setup';
+  if(r.status===413) return 'too_large';
+  return 'upstream_error';
+}
+function apiSave(next){
+  return apiFetch({method:'PUT',body:JSON.stringify({baseVersion:apiVersion,state:next})})
+    .then(function(r){
+      if(r.ok&&r.json){ apiVersion=Number(r.json.version||0); return true; }
+      if(r.json&&r.json.message) apiSetupMsg=r.json.message;
+      throw {code:codeForStatus(r)};
+    });
+}
+function adoptRemote(j){
+  apiVersion=Number(j.version||0);
+  if(j.state&&typeof j.state==='object'){
+    STATE=migrate(j.state);
+    if(UI.view==='position'&&!POS_BY_ID[UI.pos]) UI.view='overview';
+  }
+}
+function apiReload(){
+  return apiFetch().then(function(r){
+    if(r.ok&&r.json){ adoptRemote(r.json); render(); }
+  }).catch(function(){});
+}
+/* Der andere Host speichert in seinem Browser — ohne Nachfragen bekämen wir
+   davon nichts mit. Nur nachladen, wenn hier gerade nichts offen ist. */
+function startPolling(){
+  if(pollTimer) return;
+  pollTimer=setInterval(function(){
+    if(BACKEND!=='api'||saving||apiNeedsKey) return;
+    if(EDIT&&EDIT.dirty) return;
+    if(poolDirty()) return;
+    if(document.querySelector('.scrim')) return;
+    apiFetch().then(function(r){
+      if(!r.ok||!r.json) return;
+      if(Number(r.json.version||0)<=apiVersion) return;
+      adoptRemote(r.json); render();
+      toast('Neuer Stand vom anderen Host geladen');
+    }).catch(function(){});
+  },15000);
+}
+function saveApiKey(v){
+  apiKey=v||null;
+  try{ if(apiKey) localStorage.setItem('sst:key',apiKey); else localStorage.removeItem('sst:key'); }catch(e){}
+}
+function detectBackend(){
+  return claudeUse().then(function(ns){
+    if(ns){ artifactNS=ns; BACKEND='artifact'; writeState='ready'; render(); return; }
+    return apiFetch().then(function(r){
+      if(!r.json){ BACKEND='readonly'; render(); return; }   /* statischer Host */
+      if(r.status===401){ BACKEND='api'; apiNeedsKey=true; render(); return; }
+      if(r.status===503){
+        BACKEND='api'; apiSetupMsg=(r.json&&r.json.message)||''; render(); return;
+      }
+      if(r.ok){
+        BACKEND='api'; apiNeedsKey=false;
+        adoptRemote(r.json); startPolling(); render(); return;
+      }
+      BACKEND='readonly'; render();
+    });
+  }).catch(function(){ BACKEND='readonly'; render(); });
 }
 
 /* ============================================================
@@ -1293,10 +1411,34 @@ function editionOptions(){
 }
 
 function renderWriteBanner(){
-  if(writeState!=='readonly') return '';
-  return '<div class="wrap"><div class="banner warn">'+
-    '<span>⚠</span><span><b>Schreibgeschützte Ansicht.</b> Eingaben bleiben nur in diesem Browser-Tab und werden nicht für den anderen Host gespeichert.</span>'+
-  '</div></div>';
+  if(BACKEND==='api'&&apiSetupMsg){
+    return '<div class="wrap"><div class="banner warn">'+
+      '<span>⚠</span><span><b>Speicher noch nicht eingerichtet.</b> '+esc(apiSetupMsg)+
+      ' Bis dahin bleiben Eingaben nur in diesem Tab.</span></div></div>';
+  }
+  if(BACKEND==='readonly'||writeState==='readonly'){
+    return '<div class="wrap"><div class="banner warn">'+
+      '<span>⚠</span><span><b>Schreibgeschützte Ansicht.</b> Diese Fassung hat keinen Speicher — '+
+      'Eingaben bleiben nur in diesem Browser-Tab und erreichen den anderen Host nicht.</span></div></div>';
+  }
+  return '';
+}
+
+/* Auf Vercel liegt der Stand hinter einem gemeinsamen Passwort, weil die
+   Adresse öffentlich erreichbar ist. */
+function renderKeyGate(){
+  return '<div class="wrap gate">'+
+    '<div class="gatebox">'+
+      '<div class="mark" style="justify-content:center"><span class="m1">Stammtisch</span><span class="m2">Trainer</span></div>'+
+      '<h1>Passwort</h1>'+
+      '<p>Diese Fassung ist über das Netz erreichbar. Gib das gemeinsame Passwort ein, '+
+      'dann bleibt es in diesem Browser gespeichert.</p>'+
+      '<form data-act="key-form">'+
+        '<input type="password" data-act="key-input" placeholder="Passwort" autocomplete="current-password" autofocus>'+
+        '<button class="btn pri" type="submit">Öffnen</button>'+
+      '</form>'+
+    '</div>'+
+  '</div>';
 }
 
 /* ============================================================
@@ -1852,6 +1994,12 @@ var pendingPoolFocus=false;
 
 function render(){
   var app=$('#app');
+  if(BACKEND==='api'&&apiNeedsKey){
+    app.innerHTML=renderKeyGate();
+    var f=app.querySelector('[data-act="key-input"]');
+    if(f) f.focus();
+    return;
+  }
   var body = UI.view==='pool' ? renderPool()
            : UI.view==='editions' ? renderEditions()
            : UI.view==='position' ? renderPosition()
@@ -2270,6 +2418,29 @@ function wire(){
     render();
   });
 
+  app.addEventListener('submit',function(e){
+    if(!e.target.matches||!e.target.matches('[data-act="key-form"]')) return;
+    e.preventDefault();
+    var inp=e.target.querySelector('[data-act="key-input"]');
+    var v=(inp&&inp.value||'').trim();
+    if(!v){ toast('Bitte das Passwort eingeben.',true); return; }
+    saveApiKey(v);
+    apiFetch().then(function(r){
+      if(r.ok&&r.json){
+        apiNeedsKey=false; adoptRemote(r.json); startPolling(); render();
+        toast('Willkommen zurück');
+      }else if(r.status===401){
+        saveApiKey(null);
+        if(inp){ inp.value=''; inp.focus(); }
+        toast('Passwort stimmt nicht.',true);
+      }else if(r.status===503){
+        apiNeedsKey=false; apiSetupMsg=(r.json&&r.json.message)||''; render();
+      }else{
+        toast('Server nicht erreichbar.',true);
+      }
+    }).catch(function(){ toast('Server nicht erreichbar.',true); });
+  });
+
   app.addEventListener('input',function(e){
     var t=e.target;
     if(t.matches('[data-act="q"]')){ if(EDIT) refreshAC(t); return; }
@@ -2402,14 +2573,7 @@ function init(){
   if(UI.tab!=='konsens'&&!HOST_BY_ID[UI.tab]) UI.tab=UI.me;
   poolDraftLoad();
   render(); wire();
-  claudeUse().then(function(ns){
-    if(ns){ artifactNS=ns; writeState='ready'; }
-    else{
-      writeState='readonly';
-      var a=document.activeElement;
-      if(!a||!a.matches||!a.matches('input,select,textarea')) render();
-    }
-  });
+  detectBackend();
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
 else init();
