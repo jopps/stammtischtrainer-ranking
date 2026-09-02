@@ -25,6 +25,7 @@ html{-webkit-text-size-adjust:100%}
   --shadow:0 1px 2px rgba(20,26,22,.06),0 8px 24px -12px rgba(20,26,22,.22);
   --shadow-lg:0 24px 60px -20px rgba(20,26,22,.38);
   --r:10px; --r-lg:16px;
+  --rank-top:#17293A; --rank-a:#C08A12; --rank-b:#F0A81B; --rank-last:#C4441C;
   --display:"Barlow Condensed","Haettenschweiler","Arial Narrow",system-ui,sans-serif;
   --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -43,6 +44,7 @@ html{-webkit-text-size-adjust:100%}
     --ok:#67C692; --ok-bg:#14301F;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
     --shadow-lg:0 24px 60px -20px rgba(0,0,0,.8);
+    --rank-top:#2E4C66;   /* auf dunklem Grund braucht das Navy mehr Helligkeit */
   }
 }
 :root[data-theme="dark"]{
@@ -57,6 +59,7 @@ html{-webkit-text-size-adjust:100%}
   --ok:#67C692; --ok-bg:#14301F;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
   --shadow-lg:0 24px 60px -20px rgba(0,0,0,.8);
+  --rank-top:#2E4C66;
 }
 
 /* ---------- base ---------- */
@@ -403,6 +406,32 @@ pre.code{background:var(--panel-2);border:1px solid var(--line);border-radius:va
 .mtxt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .row .nm>span,.prow .nm>span,.crow .nm>span{display:flex;align-items:center;gap:5px}
 .ac li .tm{display:flex;align-items:center;gap:5px}
+/* ---------- Rang-Boxen nach der Sendungsgrafik ---------- */
+.row.boxed,.crow.boxed{padding:0 11px 0 0;gap:11px;overflow:hidden;align-items:stretch;min-height:52px}
+.rankbox{align-self:stretch;width:48px;flex:0 0 auto;display:grid;place-items:center;
+  font-family:var(--display);font-weight:700;font-size:23px;line-height:1;color:#fff;
+  letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.rankbox.r-top{background:var(--rank-top)}
+.rankbox.r-a{background:var(--rank-a)}
+.rankbox.r-b{background:var(--rank-b)}
+.rankbox.r-last{background:var(--rank-last)}
+.row.boxed>.tlogo,.crow.boxed>.tlogo{align-self:center}
+.row.boxed .nm,.crow.boxed .nm{align-self:center}
+.row.boxed .dlt,.crow.boxed .dlt{align-self:center}
+.tlogo.lg{width:30px;height:30px;border-radius:6px}
+.tlogo.lg img{width:24px;height:24px}
+.mage{flex:0 0 auto;white-space:nowrap}
+/* Adi und Fabio untereinander, damit daneben Platz fürs Alter bleibt */
+.crow .votes{flex-direction:column;align-items:flex-end;gap:3px;align-self:center}
+/* schmalere Wertungs-Chips, damit mehr Breite für den Klubnamen bleibt */
+.crow .vote{font-size:9.5px;padding:2px 6px;letter-spacing:.02em}
+.row.boxed,.crow.boxed{gap:9px}
+@media (max-width:640px){
+  .crow.boxed{flex-wrap:nowrap}
+  .crow .votes{width:auto;justify-content:flex-start;padding-left:0}
+  .rankbox{width:40px;font-size:20px}
+}
+
 .gate{display:grid;place-items:center;min-height:78vh;padding:24px 0}
 .gatebox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);
   padding:30px 28px;max-width:400px;width:100%;text-align:center}
@@ -553,20 +582,35 @@ function logoFor(team){
   LOGO_CACHE[k]=hit;
   return hit;
 }
-function teamMark(team){
+function teamMark(team,size){
+  var cls='tlogo'+(size?' '+size:'');
   var l=logoFor(team);
-  if(l) return '<span class="tlogo'+(l.tone==='light'?' on-dark':'')+'">'+
+  if(l) return '<span class="'+cls+(l.tone==='light'?' on-dark':'')+'">'+
     '<img src="'+l.src+'" alt="" loading="lazy"></span>';
   var ini=(team||'?').replace(/[^A-Za-zÀ-ÿ ]/g,'').split(/\s+/).filter(Boolean)
     .map(function(w){return w[0];}).join('').slice(0,3).toUpperCase();
-  return '<span class="tlogo empty">'+esc(ini||'?')+'</span>';
+  return '<span class="'+cls+' empty">'+esc(ini||'?')+'</span>';
+}
+function metaParts(entry){
+  var live=inPool(entry.id);
+  return {team:(live&&live.team)||entry.team||'', age:ageOf(live||entry)};
+}
+/* Klub darf gekürzt werden, das Alter nie — es steht in einem eigenen, nicht
+   schrumpfenden Element. */
+function metaTextOf(entry){
+  var m=metaParts(entry);
+  return '<span class="mtxt">'+esc(m.team||'—')+'</span>'+
+         (m.age?'<span class="mage">· '+m.age+' J.</span>':'');
 }
 /* Team-Zeile unter dem Namen: Logo, Klub, Alter aus dem Geburtsdatum. */
 function metaOf(entry){
-  var live=inPool(entry.id);
-  var team=(live&&live.team)||entry.team||'';
-  var a=ageOf(live||entry);
-  return teamMark(team)+'<span class="mtxt">'+esc(team||'—')+(a?' · '+a+' J.':'')+'</span>';
+  return teamMark(metaParts(entry).team)+metaTextOf(entry);
+}
+/* Rang-Kachel im Stil der Sendungsgrafik: Platz 1 dunkel, Mittelfeld in zwei
+   Goldtönen im Wechsel, der letzte Platz rot. */
+function rankBox(ix,total){
+  var cls = ix===1 ? 'r-top' : (total>2&&ix===total) ? 'r-last' : (ix%2 ? 'r-b' : 'r-a');
+  return '<span class="rankbox '+cls+'">'+ix+'</span>';
 }
 function icon(d){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+d+'</svg>';}
 var IC={
@@ -1253,7 +1297,7 @@ function droppedSince(posId,view,edId){
 /* ============================================================
    UI-Zustand
    ============================================================ */
-var UI={view:'overview',pos:null,tab:'adi',me:'adi',poolQ:'',poolPos:'all',
+var UI={view:'overview',pos:null,tab:'adi',me:'adi',poolQ:'',poolPos:'all',poolTeam:'all',
         poolScope:'alle',sel:{},lastSelIx:-1,assignMode:'set'};
 try{
   var savedMe=localStorage.getItem('sst:me');
@@ -1262,7 +1306,7 @@ try{
 var rr=restoreUI();
 if(rr){ UI.view=rr.view; UI.pos=rr.pos||null; UI.tab=rr.tab||UI.me; UI.poolQ=rr.poolQ||'';
         UI.poolPos=rr.poolPos||'all'; UI.me=rr.me||UI.me; UI.poolScope=rr.poolScope||'alle';
-        UI.assignMode=rr.assignMode||'set'; }
+        UI.poolTeam=rr.poolTeam||'all'; UI.assignMode=rr.assignMode||'set'; }
 
 var EDIT=null;       /* {pos,host,tiers,dirty} */
 var POOLEDIT=null;   /* {players,dirty} — gesammelte Positions-Zuordnungen */
@@ -1497,15 +1541,17 @@ function tierPanel(tierId,inner,countLabel){
     '<span class="n">'+countLabel+'</span></div>'+inner+'</section>';
 }
 
-function rowView(p,ix,delta){
+function rowView(p,flatIx,total,delta){
   var live=inPool(p.id);
   var missing=poolPlayers().length&&!live;
   var left=poolPlayers().length&&live&&live.gone;
-  return '<li class="row"><span class="rk mono">'+(ix+1)+'</span>'+
+  return '<li class="row boxed">'+
+    rankBox(flatIx,total)+
+    teamMark(metaParts(p).team,'lg')+
     '<span class="nm"><b>'+esc(p.name)+
       (missing?'<span class="gone">nicht im Pool</span>':'')+
       (left?'<span class="gone">nicht mehr im Kader</span>':'')+'</b>'+
-    '<span>'+metaOf(p)+'</span></span>'+
+    '<span>'+metaTextOf(p)+'</span></span>'+
     deltaChip(delta)+'</li>';
 }
 
@@ -1533,12 +1579,12 @@ function renderHostRanking(posId,hostId){
       '</div></div>';
     return h;
   }
-  var prevRanks=previousFlat(posId,hostId), flatIx=0;
+  var prevRanks=previousFlat(posId,hostId), flatIx=0, total=countEntry(e);
   h+='<div class="board cols">';
   TIERS.forEach(function(t){
     var list=e.tiers[t.id]||[];
     var inner=list.length
-      ? '<ul>'+list.map(function(p,ix){ flatIx++; return rowView(p,ix,deltaFor(prevRanks,p.id,flatIx)); }).join('')+'</ul>'
+      ? '<ul>'+list.map(function(p){ flatIx++; return rowView(p,flatIx,total,deltaFor(prevRanks,p.id,flatIx)); }).join('')+'</ul>'
       : '<div class="empty">Kein Spieler in diesem Tier.</div>';
     h+=tierPanel(t.id,inner,list.length+'');
   });
@@ -1631,6 +1677,7 @@ function renderConsensus(posId){
   }
   var g=consensus(posId);
   var prevRanks=previousFlat(posId,'konsens'), flatIx=0;
+  var total=TIERS.reduce(function(n,t){return n+g[t.id].length;},0);
   var h='<div class="board cols">';
   TIERS.forEach(function(t){
     var list=g[t.id];
@@ -1642,21 +1689,22 @@ function renderConsensus(posId){
         if(!b) return '<span class="vote miss">'+hh.name[0]+' –</span>';
         return '<span class="vote '+b.tier+'">'+hh.name[0]+' '+TIER_BY_ID[b.tier].abbr+' #'+b.rank+'</span>';
       }).join('');
-      return '<li class="crow"><span class="rk mono">'+(ix+1)+'</span>'+
-        '<span class="nm"><b>'+esc(rec.name)+'</b><span>'+metaOf(rec)+'</span></span>'+
+      return '<li class="crow boxed">'+
+        rankBox(flatIx,total)+
+        teamMark(metaParts(rec).team,'lg')+
+        '<span class="nm"><b>'+esc(rec.name)+'</b><span>'+metaTextOf(rec)+'</span></span>'+
         '<span class="votes">'+votes+'</span>'+
-        deltaChip(dl)+
-        '<span class="pts mono">'+rec.pts+'</span></li>';
+        deltaChip(dl)+'</li>';
     }).join('')+'</ul>':'<div class="empty">Kein Spieler in diesem Tier.</div>';
     h+=tierPanel(t.id,inner,list.length+'');
   });
   h+='</div>';
   h+=droppedBlock(posId,'konsens');
   h+='<div class="banner"><span>ⓘ</span><span>'+
-    '<b>So wird gerechnet:</b> Tier zählt schwer, der Platz darin fein — Auslands ready #1 = 360, '+
-    'Super-League King #1 = 260, Potenzialspieler #1 = 160 Punkte, danach je Platz einer weniger. '+
-    'Beide Wertungen werden addiert; das Tier im Konsens ist der Durchschnitt der beiden Tier-Einstufungen. '+
-    'Nennt nur einer einen Spieler, sammelt er auch nur einmal Punkte.'+
+    '<b>So entsteht die Reihenfolge:</b> Das Tier zählt schwer, der Platz darin fein. '+
+    'Beide Wertungen werden zusammengezählt, das Tier im Konsens ist der Durchschnitt der '+
+    'beiden Einstufungen. Nennt nur einer einen Spieler, zählt er auch nur einmal — '+
+    'Übereinstimmung wiegt dadurch schwerer als eine einzelne Spitzennennung.'+
     '</span></div>';
   h+='<div class="actions"><span class="hint">Konsens aus beiden Rankings</span><span class="sp"></span>'+
     '<button class="btn" data-act="copy" data-p="'+posId+'">Als Text kopieren</button></div>';
@@ -1700,9 +1748,18 @@ function renderPosition(){
    ============================================================ */
 var SAMPLE_CSV='Name;Position;Team;Geburtsdatum\nMarvin Keller;Torwart;BSC Young Boys;2002-07-03\nLewin Blum;Aussenverteidiger;BSC Young Boys;2001-04-01\nAlbian Hajdari;Innenverteidiger;FC Lugano;2003-08-17\nArdon Jashari;Defensives Mittelfeld;FC Luzern;2002-07-30\nXherdan Shaqiri;Offensives Mittelfeld;FC Basel 1893;1991-10-10\nRenato Steffen;Flügelspieler;FC Lugano;1991-11-03\nZan Celar;Stürmer;FC Basel 1893;1999-03-08';
 
+function poolTeams(){
+  var seen={}, out=[];
+  poolPlayers().forEach(function(p){
+    var t=(p.team||'').trim();
+    if(t&&!seen[t]){ seen[t]=1; out.push(t); }
+  });
+  return out.sort(function(a,b){return a.localeCompare(b,'de');});
+}
 function poolFiltered(){
   var q=fold(UI.poolQ), all=poolPlayers();
   return all.filter(function(p){
+    if(UI.poolTeam!=='all' && (p.team||'')!==UI.poolTeam) return false;
     if(UI.poolScope==='neu' && !isNewSince(p)) return false;
     if(UI.poolScope==='weg' && !p.gone) return false;
     if(UI.poolScope==='ohne' && p.pos.length) return false;
@@ -1768,6 +1825,11 @@ function renderPool(){
   h+='<div class="panel">'+
     '<div class="filters">'+
       '<input type="search" data-act="poolq" placeholder="Name oder Team suchen…" value="'+esc(UI.poolQ)+'">'+
+      '<select data-act="poolteam" aria-label="Mannschaft"><option value="all">Alle Mannschaften</option>'+
+        poolTeams().map(function(t){
+          return '<option value="'+esc(t)+'"'+(UI.poolTeam===t?' selected':'')+'>'+esc(t)+'</option>';
+        }).join('')+
+      '</select>'+
       '<div class="seg">'+
         '<button data-act="scope" data-s="alle"  aria-pressed="'+(UI.poolScope==='alle')+'">Alle '+all.length+'</button>'+
         '<button data-act="scope" data-s="neu"   aria-pressed="'+(UI.poolScope==='neu')+'">Neu '+counts.neu+'</button>'+
@@ -1804,7 +1866,8 @@ function renderPool(){
             '<span class="nm"><b>'+esc(p.name)+
               (isNewSince(p)?'<span class="tagi neu">NEU</span>':'')+
               (p.gone?'<span class="tagi weg">nicht mehr im Kader</span>':'')+
-            '</b><span>'+teamMark(p.team)+'<span class="mtxt">'+esc(p.team||'—')+(a?' · '+a+' J.':'')+'</span></span></span>'+
+            '</b><span>'+teamMark(p.team)+'<span class="mtxt">'+esc(p.team||'—')+'</span>'+
+              (a?'<span class="mage">· '+a+' J.</span>':'')+'</span></span>'+
             '<span class="chips">'+posChips(p)+'</span>'+
           '</li>';
         }).join('')+'</ul>':'<div class="empty">Kein Spieler passt zu diesem Filter.</div>')+
@@ -1994,6 +2057,11 @@ var pendingPoolFocus=false;
 
 function render(){
   var app=$('#app');
+  /* Neuzeichnen ersetzt das ganze DOM — ohne das hier springt die Spielerliste
+     bei jeder Auswahl zurück an den Anfang. */
+  var listTop=null, prev=app.querySelector('.pool-list');
+  if(prev) listTop=prev.scrollTop;
+  var winY=window.pageYOffset;
   if(BACKEND==='api'&&apiNeedsKey){
     app.innerHTML=renderKeyGate();
     var f=app.querySelector('[data-act="key-input"]');
@@ -2015,6 +2083,9 @@ function render(){
     if(pq){ pq.focus(); var v=pq.value; pq.value=''; pq.value=v; }
     pendingPoolFocus=false;
   }
+  var now=app.querySelector('.pool-list');
+  if(now&&listTop!=null) now.scrollTop=listTop;
+  if(winY&&window.pageYOffset!==winY) window.scrollTo(0,winY);
 }
 
 function go(view,pos){
@@ -2450,6 +2521,7 @@ function wire(){
   app.addEventListener('change',function(e){
     var t=e.target;
     if(t.matches('[data-act="edsel"]')){ switchEdition(t.value); return; }
+    if(t.matches('[data-act="poolteam"]')){ UI.poolTeam=t.value; clearSel(); stashUI(); render(); return; }
     if(t.id==='file'){ applyCSV(t.files&&t.files[0]); t.value=''; return; }
   });
 
