@@ -36,6 +36,22 @@ Steuerung mit Pfeiltasten oder Leertaste, Esc schliesst. Die nächsten drei Bild
 vorgeladen, damit beim Weiterklicken kein leerer Kasten aufblitzt. Positionen ohne
 vollständigen Konsens werden übersprungen.
 
+## Darstellung der Ranglisten
+
+Die Listen in der Ranking- und Konsensansicht sind der Story-Grafik der Sendung
+nachgebaut: Rangkachel links (Platz 1 navy, dazwischen zwei Goldtöne im Wechsel, letzter
+Platz rot), **darunter die Veränderung** (`+2` grün, `−1` rot, `NEU` navy, `=` grau), daneben
+das Spielerbild, dann der Name in Schablonenschrift, darunter Wappen, ausgeschriebener Klub
+und Alter.
+
+Diese Ansicht verwendet **feste Farben statt der Themen-Tokens** — Creme und Navy, in hell
+wie dunkel gleich. Das ist Absicht: Was hier steht, geht so in die Sendung, und die
+Bildsprache soll nicht mit dem Systemthema kippen. Der Editor bleibt davon unberührt und
+folgt weiterhin dem App-Thema, damit sich beim Arbeiten nichts aufdrängt.
+
+Schrift: *Big Shoulders Stencil Display* von Google Fonts, mit Barlow Condensed als
+Rückfallebene, falls sie nicht lädt.
+
 ## Rankings und Veränderung
 
 Jedes Ranking ist ein eigener, vollständiger Stand. Beim Anlegen lassen sich die Eingaben

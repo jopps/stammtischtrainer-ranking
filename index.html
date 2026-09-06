@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <title>Stammtischtrainer Ranking</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Big+Shoulders+Stencil+Display:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style id="sst-style">
 /* ---------- reset ---------- */
 *,*::before,*::after{box-sizing:border-box}
@@ -26,6 +26,9 @@ html{-webkit-text-size-adjust:100%}
   --shadow-lg:0 24px 60px -20px rgba(20,26,22,.38);
   --r:10px; --r-lg:16px;
   --rank-top:#17293A; --rank-a:#C08A12; --rank-b:#F0A81B; --rank-last:#C4441C;
+  --stencil:"Big Shoulders Stencil Display","Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --show-cream:#F3E6C6; --show-row:#FBF5E6; --show-navy:#17293A; --show-mute:#5E6B77;
+  --show-line:#E4D5AE; --show-up:#2E7D46; --show-down:#C4441C;
   --display:"Barlow Condensed","Haettenschweiler","Arial Narrow",system-ui,sans-serif;
   --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -556,6 +559,58 @@ pre.code{background:var(--panel-2);border:1px solid var(--line);border-radius:va
   .edcard{gap:9px}
   .edacts{width:100%}
 }
+/* ---------- Listendarstellung im Sendungsdesign ----------
+   Bewusst feste Farben statt Themen-Tokens: das ist die Bildsprache der
+   Sendung und soll in hell wie dunkel gleich aussehen. */
+.tier.showstyle{background:var(--show-cream);border-color:var(--show-line)}
+.tier.showstyle .tier-head{border-bottom-color:var(--show-line);border-left-color:var(--tc)}
+.tier.showstyle .tier-head h3{font-family:var(--stencil);font-weight:700;color:var(--show-navy);
+  font-size:23px;letter-spacing:.01em}
+.tier.showstyle .tier-head .n{color:var(--show-mute)}
+.tier.showstyle .empty{color:var(--show-mute)}
+.tier.showstyle ul.slist{padding:10px}
+
+.srow{display:flex;align-items:flex-start;gap:9px;margin-bottom:9px}
+.srow:last-child{margin-bottom:0}
+.srank{flex:0 0 auto;width:58px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.srank .rankbox{width:58px;height:58px;align-self:auto;border-radius:0;
+  font-family:var(--stencil);font-weight:700;font-size:31px}
+.sdelta{font-family:var(--stencil);font-weight:700;font-size:16px;line-height:1;letter-spacing:.02em;
+  min-height:16px}
+.sdelta.up{color:var(--show-up)}
+.sdelta.down{color:var(--show-down)}
+.sdelta.neu{color:var(--show-navy);font-size:14px}
+.sdelta.same{color:var(--show-mute)}
+.sbody{flex:1;min-width:0;display:flex;align-items:center;gap:11px;background:var(--show-row);
+  min-height:58px;padding:5px 12px 5px 5px}
+.sbody .pfoto.sq{width:48px;height:48px;border-radius:0;background:#EFE7D3;border:0;
+  color:var(--show-mute);font-family:var(--stencil);font-size:17px}
+.stxt{min-width:0;flex:1}
+.stxt b{display:block;font-family:var(--stencil);font-weight:700;font-size:25px;line-height:1.02;
+  text-transform:uppercase;color:var(--show-navy);letter-spacing:.005em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sclub{display:flex;align-items:center;gap:6px;margin-top:3px;min-width:0}
+.scname{font-family:var(--stencil);font-weight:600;font-size:15px;text-transform:uppercase;
+  color:var(--show-navy);letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sage{font-family:var(--stencil);font-weight:600;font-size:15px;color:var(--show-mute);
+  flex:0 0 auto;letter-spacing:.02em}
+.sclub .tlogo{border-color:rgba(23,41,58,.14)}
+.srow .gone{flex:0 0 auto}
+.srow .votes{flex:0 0 auto;flex-direction:column;align-items:flex-end;gap:3px;align-self:center}
+.srow .vote{background:#EFE7D3;border-color:transparent;color:var(--show-navy)}
+.srow .vote.a{background:#F3DFAE;color:#7A5A0C}
+.srow .vote.k{background:#E0DAF3;color:#463586}
+.srow .vote.p{background:#D8ECDD;color:#22633E}
+.srow .vote.miss{background:transparent;border:1px dashed rgba(23,41,58,.25);color:var(--show-mute)}
+@media (max-width:600px){
+  .srank{width:44px}
+  .srank .rankbox{width:44px;height:44px;font-size:24px}
+  .sbody{min-height:46px;gap:8px}
+  .sbody .pfoto.sq{width:38px;height:38px}
+  .stxt b{font-size:19px}
+  .scname,.sage{font-size:12.5px}
+  .tier.showstyle .tier-head h3{font-size:19px}
+}
 .gate{display:grid;place-items:center;min-height:78vh;padding:24px 0}
 .gatebox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);
   padding:30px 28px;max-width:400px;width:100%;text-align:center}
@@ -860,7 +915,7 @@ function formBox(opts){
    Zustand + Speichern
    ============================================================ */
 var HEAD_TITLE='Stammtischtrainer Ranking';
-var FONT_HREF='https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap';
+var FONT_HREF='https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Big+Shoulders+Stencil+Display:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap';
 var SHELL='<div id="app"></div>\n<div id="toast" role="status" aria-live="polite"><\/div>';
 
 var STATE;
@@ -1424,6 +1479,14 @@ function deltaFor(prevRanks,id,curRank){
   if(was===curRank) return {dir:'same',by:0};
   return was>curRank?{dir:'up',by:was-curRank}:{dir:'down',by:curRank-was};
 }
+/* Veränderung im Story-Stil: +1 / -1 / NEU / = */
+function showDelta(d){
+  if(!d) return '<span class="sdelta none"></span>';
+  if(d.dir==='new') return '<span class="sdelta neu">NEU</span>';
+  if(d.dir==='same') return '<span class="sdelta same">=</span>';
+  var up=d.dir==='up';
+  return '<span class="sdelta '+(up?'up':'down')+'">'+(up?'+':'−')+d.by+'</span>';
+}
 function deltaChip(d){
   if(!d) return '';
   if(d.dir==='new') return '<span class="dlt neu">NEU</span>';
@@ -1737,11 +1800,36 @@ function renderLineup(){
 /* ============================================================
    Rendering — Positionsansicht
    ============================================================ */
-function tierPanel(tierId,inner,countLabel){
+function tierPanel(tierId,inner,countLabel,show){
   var t=TIER_BY_ID[tierId];
-  return '<section class="tier t-'+t.id+'" data-tier="'+t.id+'">'+
+  return '<section class="tier t-'+t.id+(show?' showstyle':'')+'" data-tier="'+t.id+'">'+
     '<div class="tier-head"><span class="tbadge">'+t.abbr+'</span><h3>'+esc(t.name)+'</h3>'+
     '<span class="n">'+countLabel+'</span></div>'+inner+'</section>';
+}
+
+/* Zeile im Look der Sendungsgrafik: Rangkachel mit der Veränderung darunter,
+   daneben Bild, Name in Schablonenschrift, darunter Wappen, Klub und Alter. */
+function showRow(p,flatIx,total,delta,extra){
+  var live=inPool(p.id);
+  var missing=poolPlayers().length&&!live;
+  var left=poolPlayers().length&&live&&live.gone;
+  var m=metaParts(p);
+  return '<li class="srow">'+
+    '<span class="srank">'+rankBox(flatIx,total)+showDelta(delta)+'</span>'+
+    '<span class="sbody">'+
+      playerPhoto(p,'sq')+
+      '<span class="stxt">'+
+        '<b>'+esc(p.name)+'</b>'+
+        '<span class="sclub">'+teamMark(m.team)+
+          '<span class="scname">'+esc(m.team||'—')+'</span>'+
+          (m.age?'<span class="sage">· '+m.age+' J.</span>':'')+
+          (missing?'<span class="gone">nicht im Pool</span>':'')+
+          (left?'<span class="gone">nicht mehr im Kader</span>':'')+
+        '</span>'+
+      '</span>'+
+      (extra||'')+
+    '</span>'+
+  '</li>';
 }
 
 function rowView(p,flatIx,total,delta){
@@ -1787,9 +1875,9 @@ function renderHostRanking(posId,hostId){
   TIERS.forEach(function(t){
     var list=e.tiers[t.id]||[];
     var inner=list.length
-      ? '<ul>'+list.map(function(p){ flatIx++; return rowView(p,flatIx,total,deltaFor(prevRanks,p.id,flatIx)); }).join('')+'</ul>'
+      ? '<ul class="slist">'+list.map(function(p){ flatIx++; return showRow(p,flatIx,total,deltaFor(prevRanks,p.id,flatIx)); }).join('')+'</ul>'
       : '<div class="empty">Kein Spieler in diesem Tier.</div>';
-    h+=tierPanel(t.id,inner,list.length+'');
+    h+=tierPanel(t.id,inner,list.length+'',true);
   });
   h+='</div>';
   h+=droppedBlock(posId,hostId);
@@ -1884,7 +1972,7 @@ function renderConsensus(posId){
   var h='<div class="board cols">';
   TIERS.forEach(function(t){
     var list=g[t.id];
-    var inner=list.length?'<ul>'+list.map(function(rec,ix){
+    var inner=list.length?'<ul class="slist">'+list.map(function(rec,ix){
       flatIx++;
       var dl=deltaFor(prevRanks,rec.id,flatIx);
       var votes=HOSTS.map(function(hh){
@@ -1892,14 +1980,9 @@ function renderConsensus(posId){
         if(!b) return '<span class="vote miss">'+hh.name[0]+' –</span>';
         return '<span class="vote '+b.tier+'">'+hh.name[0]+' '+TIER_BY_ID[b.tier].abbr+' #'+b.rank+'</span>';
       }).join('');
-      return '<li class="crow boxed">'+
-        rankBox(flatIx,total)+
-        '<span class="dltcell">'+(deltaChip(dl)||'')+'</span>'+
-        playerPhoto(rec)+
-        '<span class="nm"><b>'+esc(rec.name)+'</b><span>'+metaOf(rec)+'</span></span>'+
-        '<span class="votes">'+votes+'</span></li>';
+      return showRow(rec,flatIx,total,dl,'<span class="votes">'+votes+'</span>');
     }).join('')+'</ul>':'<div class="empty">Kein Spieler in diesem Tier.</div>';
-    h+=tierPanel(t.id,inner,list.length+'');
+    h+=tierPanel(t.id,inner,list.length+'',true);
   });
   h+='</div>';
   h+=droppedBlock(posId,'konsens');
