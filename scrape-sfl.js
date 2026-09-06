@@ -9,9 +9,12 @@
  * Die Liste ist per Cursor paginiert (max. 99 Treffer pro Request), das Skript
  * blättert alles durch und wartet zwischen den Requests.
  *
- * Die CSV enthält genau die vier Spalten, die das Ranking-Tool einliest:
- * Name, Position, Team, Geburtsdatum. Das Alter rechnet das Tool selbst aus dem
+ * Die CSV enthält die Spalten, die das Ranking-Tool einliest: Name, Position,
+ * Team, Geburtsdatum und Bild. Das Alter rechnet das Tool selbst aus dem
  * Geburtsdatum — so veraltet die Zahl nicht mit der Datei.
+ *
+ * Die Bild-Adressen zeigen auf cdn.scoreplay.io. Auf Vercel werden sie geladen,
+ * im Artifact sperrt die CSP externe Bilder — dort erscheinen die Initialen.
  *
  * ACHTUNG POSITIONEN: sfl.ch kennt nur vier Positionen — Goalkeeper, Defender,
  * Midfielder, Attacker. Torwart ist damit fertig, alles andere muss von Hand
@@ -82,11 +85,12 @@ function csvCell(v){
     a.lastName.localeCompare(b.lastName,'de')
   );
 
-  const lines = ['Name;Position;Team;Geburtsdatum'];
+  const lines = ['Name;Position;Team;Geburtsdatum;Bild'];
   for(const p of players){
     const name = [p.firstName, p.lastName].filter(Boolean).join(' ').trim();
     lines.push([name, POS_DE[p.position] || p.position || '', p.teamName || '',
-                (p.dateOfBirth || '').slice(0,10)]
+                (p.dateOfBirth || '').slice(0,10),
+                p.profilePicture || p.profilePictureThumb || '']
       .map(csvCell).join(';'));
   }
 

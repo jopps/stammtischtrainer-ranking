@@ -16,6 +16,26 @@ Tier-Ranking-Tool für den Podcast *Die Stammtischtrainer*.
 - **Historisierung:** Rankings sind nach Saison und Zeitpunkt abgelegt (nach Transferfenster,
   nach der Hinrunde, Saisonende). Umschalter oben rechts, Verwaltung unter *Rankings*.
 
+## Aufstellung und Präsentationsmodus
+
+Die Übersicht zeigt oben eine **Aufstellung** auf sieben Positionen — Torwart hinten,
+Sturm vorne, dazwischen die beiden Aussenbahnen. Jede Karte nennt gross den
+Erstplatzierten im Konsens und darunter klein, wen Adi und Fabio je zuoberst haben.
+Stimmen sie mit dem Konsens überein, ist ihr Kürzel grün.
+
+Der **Präsentationsmodus** (Knopf neben der Aufstellung) blendet die App aus und zeigt
+einen Spieler nach dem anderen — gedacht fürs Aufnehmen:
+
+- von hinten nach vorne: Torwart zuerst, Stürmer zuletzt
+- innerhalb einer Position von Potenzialspieler hinauf zu Auslands ready
+- innerhalb eines Tiers vom letzten Platz zum ersten, damit sich der Spitzenplatz aufbaut
+- eingeblendet werden Tier, Position im Tier („2 von 4"), Rang, Veränderung zum
+  vorherigen Ranking, Bild, Klub und Alter
+
+Steuerung mit Pfeiltasten oder Leertaste, Esc schliesst. Die nächsten drei Bilder werden
+vorgeladen, damit beim Weiterklicken kein leerer Kasten aufblitzt. Positionen ohne
+vollständigen Konsens werden übersprungen.
+
 ## Rankings und Veränderung
 
 Jedes Ranking ist ein eigener, vollständiger Stand. Beim Anlegen lassen sich die Eingaben
@@ -98,6 +118,20 @@ Ein neuer Upload **gleicht ab**, statt zu überschreiben:
   **nicht gelöscht** — sie bleiben in bestehenden Rankings sichtbar
 
 `spieler-vorlage.csv` ist eine ausfüllbare Vorlage.
+
+### Direktimport statt CSV
+
+In der auf Vercel gehosteten Fassung gibt es im Spielerpool den Knopf **Direkt von sfl.ch
+laden**. Er holt Kader und Spielerbilder in einem Zug über `/api/roster` — dieselbe
+Abgleich-Logik wie beim CSV-Import, nur ohne Datei. Im Artifact fehlt diese Funktion, weil
+die Seite dort keine fremden Server abfragen darf; dort bleibt der CSV-Weg.
+
+### Spielerbilder
+
+Die Bilder liegen bei sfl.ch auf `cdn.scoreplay.io`; gespeichert wird nur die Adresse, nicht
+das Bild. **Auf Vercel werden sie geladen, im Artifact nicht** — dort sperrt die
+Inhaltsrichtlinie fremde Bilder, und statt des Fotos erscheinen die Initialen. 315 der rund
+360 Spieler haben ein Bild.
 
 ## Spielerliste von sfl.ch holen
 

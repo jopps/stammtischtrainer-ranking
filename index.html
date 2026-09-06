@@ -88,7 +88,7 @@ h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;text-wrap:b
 .mark .m1{font-family:var(--display);font-weight:700;font-size:25px;text-transform:uppercase;letter-spacing:.02em}
 .mark .m2{font-family:var(--display);font-weight:600;font-size:25px;text-transform:uppercase;color:var(--brand);letter-spacing:.02em}
 .mark .m3{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3);padding-left:2px}
-@media (max-width:720px){.mark .m3{display:none}}
+@media (max-width:1200px){.mark .m3{display:none}}
 .top-nav{display:flex;gap:2px;margin-left:6px}
 .top-nav button{
   font-family:var(--display);font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
@@ -99,7 +99,7 @@ h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;text-wrap:b
 .top-sp{flex:1}
 .whoami{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .whoami .lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
-@media (max-width:820px){.whoami .lbl{display:none}}
+@media (max-width:1200px){.whoami .lbl{display:none}}
 .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:99px;padding:3px}
 .seg button{
   font-family:var(--display);font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
@@ -300,8 +300,17 @@ pre.code{background:var(--panel-2);border:1px solid var(--line);border-radius:va
 .edsel select{background:var(--panel-2);border:1px solid var(--line);border-radius:99px;padding:5px 12px;
   font-size:13.5px;max-width:210px}
 .edsel select:focus{outline:none;border-color:var(--ink-3)}
-@media (max-width:900px){.edsel .lbl{display:none}.edsel select{max-width:140px}}
-@media (max-width:640px){.top-in{height:auto;flex-wrap:wrap;padding:9px 0;gap:9px}.top-sp{display:none}}
+@media (max-width:1200px){.edsel .lbl{display:none}.edsel select{max-width:170px}}
+/* Die Kopfzeile trägt Wortmarke, drei Navigationspunkte, Ranking-Auswahl und
+   Host-Umschalter — ab hier passt das nicht mehr in eine Reihe. */
+@media (max-width:1000px){
+  .top-in{height:auto;flex-wrap:wrap;padding:9px 0;gap:8px}
+  .top-sp{display:none}
+  .top-nav{order:3;width:100%;justify-content:space-between;margin-left:0}
+  .top-nav button{flex:1;text-align:center}
+  .edsel{order:2;margin-left:auto}
+  .whoami{order:2}
+}
 .edtag{display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;
   background:var(--panel-3);border:1px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--ink-2);margin-right:6px}
 
@@ -432,6 +441,121 @@ pre.code{background:var(--panel-2);border:1px solid var(--line);border-radius:va
   .rankbox{width:40px;font-size:20px}
 }
 
+/* ---------- Spielerbilder ---------- */
+.pfoto{width:40px;height:40px;flex:0 0 auto;border-radius:8px;overflow:hidden;background:var(--panel-3);
+  display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink-3);
+  border:1px solid var(--line-soft);align-self:center}
+.pfoto img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;display:block}
+.pfoto.empty img{display:none}
+.pfoto.lu{width:100%;height:auto;aspect-ratio:1/1;border-radius:10px 10px 0 0;border:0;font-size:26px}
+.pfoto.xl{width:190px;height:190px;border-radius:14px;font-size:52px}
+.dltcell{flex:0 0 auto;display:grid;place-items:center;min-width:40px;align-self:center}
+.dltcell:empty{min-width:0}
+
+/* ---------- Abschnittsköpfe ---------- */
+.secthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:26px 0 12px}
+.secthead h2{font-size:24px;text-transform:uppercase}
+.secthead .sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.secthead .sp{flex:1}
+
+/* ---------- Aufstellung ---------- */
+.pitch-wrap{overflow-x:auto;padding-bottom:4px}
+.pitch{display:grid;gap:12px;min-width:860px;
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:auto auto;
+  grid-template-areas:"tw iv zm zmo st" "tw av zm fl st";
+  background:
+    linear-gradient(var(--line-soft),var(--line-soft)) center/1px 100% no-repeat,
+    var(--panel-2);
+  border:1px solid var(--line);border-radius:var(--r-lg);padding:14px}
+.lucard{display:flex;flex-direction:column;text-align:left;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);
+  transition:transform .16s ease,border-color .16s ease}
+.lucard:hover{transform:translateY(-2px);border-color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){.lucard{transition:none}.lucard:hover{transform:none}}
+.lu-label{background:var(--ink);color:var(--bg);font-family:var(--display);font-weight:600;
+  font-size:15px;text-transform:uppercase;letter-spacing:.04em;text-align:center;padding:5px 8px}
+.lu-top{font-weight:600;font-size:15px;padding:9px 11px 0;line-height:1.25}
+.lu-none{color:var(--ink-3);font-style:italic;font-weight:400;font-size:13.5px}
+.lu-meta{display:flex;align-items:center;gap:5px;padding:2px 11px 8px;font-family:var(--mono);
+  font-size:10px;color:var(--ink-3);overflow:hidden}
+.lu-meta .mtxt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lu-picks{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line-soft);padding:7px 11px 9px;margin-top:auto}
+.lu-pick{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);min-width:0}
+.lu-pick i{font-style:normal;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.06em;
+  width:15px;height:15px;border-radius:4px;display:grid;place-items:center;flex:0 0 auto;
+  background:var(--panel-3);color:var(--ink-3)}
+.lu-pick span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lu-pick.same i{background:var(--ok-bg);color:var(--ok)}
+.lu-pick.off span{color:var(--ink-3);font-style:italic}
+
+/* ---------- Präsentationsmodus ---------- */
+.pres{position:fixed;inset:0;z-index:70;background:var(--bg);display:flex;flex-direction:column}
+.pres-top{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pres-view{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.pres-pos{font-family:var(--display);font-weight:700;font-size:22px;text-transform:uppercase}
+.pres-sp{flex:1}
+.pres-count{font-size:12px;color:var(--ink-3)}
+.pres-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px 20px;min-height:0}
+.pres-tier{display:flex;align-items:center;gap:10px}
+.pres-tier .pres-tname{font-family:var(--display);font-weight:700;font-size:26px;text-transform:uppercase;color:var(--tc)}
+.pres-tier.t-a{--tc:var(--gold)} .pres-tier.t-k{--tc:var(--royal)} .pres-tier.t-p{--tc:var(--grow)}
+.pres-of{font-size:12px;color:var(--ink-3);border:1px solid var(--line);border-radius:99px;padding:3px 11px}
+.pres-card{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-lg);padding:22px 26px;max-width:min(760px,92vw)}
+.pres-rankwrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto}
+.pres-rankwrap .rankbox{width:78px;height:78px;font-size:40px;border-radius:8px;align-self:auto}
+.pres-delta .dlt{font-size:13px;padding:4px 9px}
+.pres-txt{min-width:0}
+.pres-txt h2{font-size:clamp(30px,5vw,50px);text-transform:uppercase;line-height:1}
+.pres-meta{display:flex;align-items:center;gap:9px;margin-top:12px;flex-wrap:wrap;color:var(--ink-2);font-size:16px}
+.pres-age{font-family:var(--mono);font-size:13px;color:var(--ink-3);border:1px solid var(--line);
+  border-radius:99px;padding:2px 10px}
+.pres-nav{display:flex;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.pres-hint{flex:1;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px){
+  .pitch{min-width:640px}
+  .pres-card{gap:16px;padding:18px}
+  .pfoto.xl{width:140px;height:140px;font-size:40px}
+}
+@media (max-width:720px){
+  .pitch{min-width:0;grid-template-columns:1fr 1fr;
+    grid-template-areas:"tw tw" "iv av" "zm zm" "zmo fl" "st st";grid-template-rows:none}
+  .pitch-wrap{overflow-x:visible}
+  .phead{padding:22px 0 16px}
+  .board.cols{grid-template-columns:1fr}
+  .secthead{padding:20px 0 10px}
+}
+@media (max-width:600px){
+  .top-nav button{font-size:15px;padding:6px 4px}
+  .edsel select{max-width:130px}
+  .mark .m1,.mark .m2{font-size:21px}
+  .row.boxed,.crow.boxed{min-height:46px;gap:7px}
+  .rankbox{width:36px;font-size:18px}
+  .pfoto{width:34px;height:34px}
+  .dltcell{min-width:0}
+  .crow .votes{gap:2px}
+  .selbar{gap:7px}
+  .selbar .cnt{min-width:0;width:100%}
+  .quickpos{gap:5px}
+  .quickpos .btn{padding:5px 9px;font-size:12.5px}
+  .pool-list{max-height:56vh}
+  .prow .chips{max-width:38%}
+  .filters{gap:7px}
+  .filters input,.filters select{padding:6px 12px;font-size:13px}
+  .pres-top,.pres-nav{padding:11px 14px}
+  .pres-stage{gap:16px;padding:16px 14px}
+  .pres-rankwrap{flex-direction:row}
+  .pres-rankwrap .rankbox{width:56px;height:56px;font-size:28px}
+  .pres-hint{display:none}
+  .pres-nav .btn{flex:1}
+  .edcard{gap:9px}
+  .edacts{width:100%}
+}
 .gate{display:grid;place-items:center;min-height:78vh;padding:24px 0}
 .gatebox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);
   padding:30px 28px;max-width:400px;width:100%;text-align:center}
@@ -590,6 +714,37 @@ function teamMark(team,size){
   var ini=(team||'?').replace(/[^A-Za-zÀ-ÿ ]/g,'').split(/\s+/).filter(Boolean)
     .map(function(w){return w[0];}).join('').slice(0,3).toUpperCase();
   return '<span class="'+cls+' empty">'+esc(ini||'?')+'</span>';
+}
+function initialsOf(name){
+  return String(name||'?').replace(/[^A-Za-zÀ-ÿ ]/g,'').split(/\s+/).filter(Boolean)
+    .map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()||'?';
+}
+/* Die Bilder liegen bei sfl.ch auf einem fremden Host. Auf Vercel laden sie,
+   im Artifact sperrt die CSP sie — dann greift der Initialen-Ersatz (siehe
+   den error-Lauscher in wire()). */
+function photoUrl(entry){
+  var live=inPool(entry.id);
+  return (live&&live.photo)||entry.photo||'';
+}
+function playerPhoto(entry,cls,eager){
+  var url=photoUrl(entry);
+  var ini=initialsOf(entry.name);
+  var base='pfoto'+(cls?' '+cls:'');
+  if(!url) return '<span class="'+base+' empty">'+esc(ini)+'</span>';
+  return '<span class="'+base+'" data-ini="'+esc(ini)+'">'+
+    '<img src="'+esc(url)+'" alt=""'+(eager?' fetchpriority="high"':' loading="lazy"')+'></span>';
+}
+/* Im Präsentationsmodus die nächsten Bilder vorladen, damit beim Weiterklicken
+   kein leerer Kasten aufblitzt. */
+var photoCache=[];
+function preloadAhead(){
+  if(!PRES) return;
+  for(var i=PRES.ix;i<Math.min(PRES.ix+3,PRES.steps.length);i++){
+    var u=photoUrl(PRES.steps[i].player);
+    if(!u) continue;
+    var im=new Image(); im.src=u; photoCache.push(im);
+  }
+  if(photoCache.length>40) photoCache=photoCache.slice(-20);
 }
 function metaParts(entry){
   var live=inPool(entry.id);
@@ -1023,21 +1178,23 @@ var HEAD_NAME=['name','spieler','player','spielername','nachname'];
 var HEAD_POS=['position','pos','positionen','rolle','spielposition'];
 var HEAD_TEAM=['team','verein','club','klub','mannschaft'];
 var HEAD_BIRTH=['geburtsdatum','geburtstag','geboren','birthdate','date of birth','dob','birthday'];
+var HEAD_PHOTO=['bild','foto','photo','image','bild url','bildurl','picture','portrait'];
 
 function parseRoster(text){
   var rows=parseCSV(text);
   if(!rows.length) return {error:'Die Datei enthält keine Zeilen.'};
   var head=rows[0].map(function(h){return fold(h);});
-  var iN=-1,iP=-1,iT=-1,iB=-1;
+  var iN=-1,iP=-1,iT=-1,iB=-1,iF=-1;
   head.forEach(function(h,ix){
     if(iN<0&&HEAD_NAME.indexOf(h)>=0) iN=ix;
     if(iP<0&&HEAD_POS.indexOf(h)>=0) iP=ix;
     if(iT<0&&HEAD_TEAM.indexOf(h)>=0) iT=ix;
     if(iB<0&&HEAD_BIRTH.indexOf(h)>=0) iB=ix;
+    if(iF<0&&HEAD_PHOTO.indexOf(h)>=0) iF=ix;
   });
   var body;
   if(iN>=0&&iP>=0){ body=rows.slice(1); }
-  else { iN=0;iP=1;iT=2;iB=3; body=rows; }
+  else { iN=0;iP=1;iT=2;iB=3;iF=4; body=rows; }
 
   var list=[],seen={},unknown={};
   body.forEach(function(r){
@@ -1058,7 +1215,8 @@ function parseRoster(text){
       return;
     }
     var row={name:name,team:team,pos:pos,raw:rawPos,
-             birth:iB>=0?parseBirth(r[iB]):null};
+             birth:iB>=0?parseBirth(r[iB]):null,
+             photo:iF>=0?String(r[iF]||'').trim():''};
     seen[key]=row; list.push(row);
   });
 
@@ -1091,6 +1249,7 @@ function mergeRoster(parsed,fileName){
       var t=outById[hit.id];
       if(row.team && t.team!==row.team){ moved.push({name:t.name,from:t.team,to:row.team}); t.team=row.team; }
       if(row.birth) t.birth=row.birth;
+      if(row.photo) t.photo=row.photo;
       t.raw=row.raw;
       t.gone=false;
       if(!t.posManual && row.pos.length) t.pos=row.pos;
@@ -1098,7 +1257,7 @@ function mergeRoster(parsed,fileName){
     }else{
       var id=playerId(row.name,row.team,taken); taken[id]=1;
       var np={id:id,name:row.name,team:row.team,pos:row.pos.slice(),raw:row.raw,
-              birth:row.birth,gone:false,posManual:false,addedAt:now};
+              birth:row.birth,photo:row.photo||'',gone:false,posManual:false,addedAt:now};
       out.push(np); outById[id]=np; seenNow[id]=1; added.push(np);
     }
   });
@@ -1508,7 +1667,15 @@ function renderOverview(){
      '<span>Positionen mit vollständigem Konsens · <span class="mono">'+pool+'</span> Spieler im Pool'+
      (STATE.pool.fileName?' · Quelle <b>'+esc(STATE.pool.fileName)+'</b>':'')+'</span></div>';
 
-  h+='<div class="grid" style="margin-top:18px">';
+  h+='<div class="secthead"><h2>Aufstellung</h2>'+
+     '<span class="sp"></span>'+
+     '<button class="btn sm" data-act="pres" data-v="konsens">Präsentation starten</button>'+
+     '<span class="sub">Erstplatzierter je Position — gross der Konsens, darunter Adi und Fabio</span></div>';
+  h+=renderLineup();
+
+  h+='<div class="secthead"><h2>Positionen</h2>'+
+     '<span class="sub">Status je Position in diesem Ranking</span></div>';
+  h+='<div class="grid">';
   POSITIONS.forEach(function(p){
     var n=poolFor(p.id).length;
     h+='<button class="pcard" data-act="open" data-p="'+p.id+'">'+
@@ -1531,6 +1698,42 @@ function renderOverview(){
   return h;
 }
 
+/* Der Erstplatzierte einer Position in der gewählten Sicht. */
+function topPick(posId,view){
+  if(view==='konsens'){
+    if(!bothDone(posId)) return null;
+    return flatListOfConsensus(consensus(posId))[0]||null;
+  }
+  var e=getEntry(posId,view);
+  return e?(flatListOfEntry(e)[0]||null):null;
+}
+
+/* Aufstellung: pro Position der Erstplatzierte im Konsens, darunter die
+   Einzelnennungen von Adi und Fabio. */
+function renderLineup(){
+  var AREA={tw:'tw',iv:'iv',av:'av',zm:'zm',zmo:'zmo',fl:'fl',st:'st'};
+  var cards=POSITIONS.map(function(pp){
+    var k=topPick(pp.id,'konsens'), a=topPick(pp.id,'adi'), f=topPick(pp.id,'fabio');
+    var head=k
+      ? playerPhoto(k,'lu')
+      : '<span class="pfoto lu empty">?</span>';
+    var line=function(tag,pick,cls){
+      if(!pick) return '<span class="lu-pick '+cls+' off"><i>'+tag+'</i><span>offen</span></span>';
+      var same=k&&pick.id===k.id;
+      return '<span class="lu-pick '+cls+(same?' same':'')+'"><i>'+tag+'</i><span>'+esc(pick.name)+'</span></span>';
+    };
+    return '<button class="lucard" style="grid-area:'+AREA[pp.id]+'" data-act="open" data-p="'+pp.id+'">'+
+      head+
+      '<span class="lu-label">'+esc(pp.name)+'</span>'+
+      '<span class="lu-top">'+(k?esc(k.name):'<span class="lu-none">Konsens offen</span>')+'</span>'+
+      '<span class="lu-meta">'+(k?metaOf(k):'')+'</span>'+
+      '<span class="lu-picks">'+line('A',a,'a')+line('F',f,'f')+'</span>'+
+    '</button>';
+  }).join('');
+
+  return '<section class="pitch-wrap"><div class="pitch">'+cards+'</div></section>';
+}
+
 /* ============================================================
    Rendering — Positionsansicht
    ============================================================ */
@@ -1547,12 +1750,12 @@ function rowView(p,flatIx,total,delta){
   var left=poolPlayers().length&&live&&live.gone;
   return '<li class="row boxed">'+
     rankBox(flatIx,total)+
-    teamMark(metaParts(p).team,'lg')+
+    '<span class="dltcell">'+(deltaChip(delta)||'')+'</span>'+
+    playerPhoto(p)+
     '<span class="nm"><b>'+esc(p.name)+
       (missing?'<span class="gone">nicht im Pool</span>':'')+
       (left?'<span class="gone">nicht mehr im Kader</span>':'')+'</b>'+
-    '<span>'+metaTextOf(p)+'</span></span>'+
-    deltaChip(delta)+'</li>';
+    '<span>'+metaOf(p)+'</span></span></li>';
 }
 
 /* Wer in der vorherigen Erhebung dabei war und jetzt fehlt. */
@@ -1691,10 +1894,10 @@ function renderConsensus(posId){
       }).join('');
       return '<li class="crow boxed">'+
         rankBox(flatIx,total)+
-        teamMark(metaParts(rec).team,'lg')+
-        '<span class="nm"><b>'+esc(rec.name)+'</b><span>'+metaTextOf(rec)+'</span></span>'+
-        '<span class="votes">'+votes+'</span>'+
-        deltaChip(dl)+'</li>';
+        '<span class="dltcell">'+(deltaChip(dl)||'')+'</span>'+
+        playerPhoto(rec)+
+        '<span class="nm"><b>'+esc(rec.name)+'</b><span>'+metaOf(rec)+'</span></span>'+
+        '<span class="votes">'+votes+'</span></li>';
     }).join('')+'</ul>':'<div class="empty">Kein Spieler in diesem Tier.</div>';
     h+=tierPanel(t.id,inner,list.length+'');
   });
@@ -1741,6 +1944,107 @@ function renderPosition(){
   }
   h+='</div>';
   return h;
+}
+
+/* ============================================================
+   Präsentationsmodus
+   ============================================================
+   Baut eine Abfolge von hinten nach vorne: Torwart zuerst, Stürmer zuletzt.
+   Innerhalb einer Position von Potenzialspieler hinauf zu Auslands ready und
+   dort jeweils vom letzten Platz zum ersten — die Spannung baut sich auf. */
+var PRES=null;   /* {steps,ix,view} */
+
+function buildPresentation(view){
+  var steps=[];
+  POSITIONS.forEach(function(pp){
+    var groups, prevRanks=previousFlat(pp.id,view), flat, total;
+    if(view==='konsens'){
+      if(!bothDone(pp.id)) return;
+      groups=consensus(pp.id);
+      flat=flatListOfConsensus(groups);
+    }else{
+      var e=getEntry(pp.id,view);
+      if(!e) return;
+      groups={}; TIERS.forEach(function(t){groups[t.id]=(e.tiers[t.id]||[]).slice();});
+      flat=flatListOfEntry(e);
+    }
+    total=flat.length;
+    var rankOf={}; flat.forEach(function(x,i){rankOf[x.id]=i+1;});
+    TIERS.slice().reverse().forEach(function(t){          /* Potenzial -> Auslands */
+      var list=(groups[t.id]||[]).slice();
+      var n=list.length;
+      list.slice().reverse().forEach(function(pl,i){      /* letzter Platz zuerst */
+        steps.push({pos:pp.id,tier:t.id,player:pl,
+                    inTier:n-i, tierCount:n,
+                    rank:rankOf[pl.id]||0, total:total,
+                    delta:deltaFor(prevRanks,pl.id,rankOf[pl.id]||0)});
+      });
+    });
+  });
+  return steps;
+}
+
+function openPresentation(view){
+  var steps=buildPresentation(view);
+  if(!steps.length){
+    toast(view==='konsens'
+      ? 'Noch kein Konsens vorhanden — dafür müssen beide abgegeben haben.'
+      : 'Für diese Sicht gibt es noch keine Einträge.',true);
+    return;
+  }
+  PRES={steps:steps,ix:0,view:view};
+  render();
+}
+function closePresentation(){ PRES=null; render(); }
+function presStep(d){
+  if(!PRES) return;
+  var n=PRES.ix+d;
+  if(n<0) n=0;
+  if(n>=PRES.steps.length) n=PRES.steps.length-1;
+  if(n===PRES.ix) return;
+  PRES.ix=n; render();
+}
+
+function renderPresentation(){
+  var st=PRES.steps[PRES.ix], p=st.player;
+  var pos=POS_BY_ID[st.pos], tier=TIER_BY_ID[st.tier];
+  var m=metaParts(p);
+  var viewName = PRES.view==='konsens' ? 'Konsens' : HOST_BY_ID[PRES.view].name;
+  return '<div class="pres">'+
+    '<div class="pres-top">'+
+      '<span class="pres-view">'+esc(viewName)+'</span>'+
+      '<span class="pres-pos">'+esc(pos.name)+'</span>'+
+      '<span class="pres-sp"></span>'+
+      '<span class="pres-count mono">'+(PRES.ix+1)+' / '+PRES.steps.length+'</span>'+
+      '<button class="btn sm" data-act="pres-close">Schliessen</button>'+
+    '</div>'+
+    '<div class="pres-stage">'+
+      '<div class="pres-tier t-'+tier.id+'">'+
+        '<span class="tbadge">'+tier.abbr+'</span>'+
+        '<span class="pres-tname">'+esc(tier.name)+'</span>'+
+        '<span class="pres-of mono">'+st.inTier+' von '+st.tierCount+'</span>'+
+      '</div>'+
+      '<div class="pres-card">'+
+        '<div class="pres-rankwrap">'+
+          rankBox(st.rank,st.total)+
+          '<div class="pres-delta">'+(deltaChip(st.delta)||'<span class="dlt same">–</span>')+'</div>'+
+        '</div>'+
+        playerPhoto(p,'xl',true)+
+        '<div class="pres-txt">'+
+          '<h2>'+esc(p.name)+'</h2>'+
+          '<div class="pres-meta">'+teamMark(m.team,'lg')+
+            '<span>'+esc(m.team||'—')+'</span>'+
+            (m.age?'<span class="pres-age">'+m.age+' Jahre</span>':'')+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="pres-nav">'+
+      '<button class="btn" data-act="pres-prev"'+(PRES.ix===0?' disabled':'')+'>← Zurück</button>'+
+      '<span class="pres-hint">Pfeiltasten oder Leertaste · Esc schliesst</span>'+
+      '<button class="btn pri" data-act="pres-next"'+(PRES.ix>=PRES.steps.length-1?' disabled':'')+'>Weiter →</button>'+
+    '</div>'+
+  '</div>';
 }
 
 /* ============================================================
@@ -1804,7 +2108,10 @@ function renderPool(){
     '<div class="drop" id="drop">'+
       '<input type="file" id="file" accept=".csv,text/csv,text/plain" class="sr">'+
       '<button class="btn pri" data-act="pick-file">CSV auswählen</button>'+
-      '<p>oder Datei hierher ziehen</p>'+
+      (BACKEND==='api'?'<button class="btn" data-act="league-import" style="margin-left:8px">Direkt von sfl.ch laden</button>':'')+
+      '<p>oder Datei hierher ziehen'+
+        (BACKEND==='api'?' — der Direktimport holt Kader und Spielerbilder in einem Zug'
+                        :' · Direktimport gibt es nur in der gehosteten Fassung')+'</p>'+
     '</div>';
   if(all.length){
     h+='<div class="kv">'+
@@ -2042,7 +2349,7 @@ function moveSel(dir){
 function pickIndex(ix){
   var it=AC.items[ix];
   if(!it||!it.ok){ if(it) toast(it.why.charAt(0).toUpperCase()+it.why.slice(1)+' — nicht auswählbar.',true); return; }
-  EDIT.tiers[AC.tier].push({id:it.p.id,name:it.p.name,team:it.p.team,birth:it.p.birth||null});
+  EDIT.tiers[AC.tier].push({id:it.p.id,name:it.p.name,team:it.p.team,birth:it.p.birth||null,photo:it.p.photo||''});
   markDirty();
   pendingFocus=AC.tier;
   AC={open:false,items:[],sel:0,tier:AC.tier,q:''};
@@ -2068,6 +2375,7 @@ function render(){
     if(f) f.focus();
     return;
   }
+  if(PRES){ app.innerHTML=renderPresentation(); preloadAhead(); return; }
   var body = UI.view==='pool' ? renderPool()
            : UI.view==='editions' ? renderEditions()
            : UI.view==='position' ? renderPosition()
@@ -2164,50 +2472,89 @@ function copyText(txt,msg){
   }
 }
 
+/* Holt den Kader über die eigene Serverless-Funktion. Im Artifact gibt es die
+   nicht — dort bleibt der CSV-Weg. */
+function importFromLeague(){
+  if(BACKEND!=='api'){
+    toast('Direktimport gibt es nur in der gehosteten Fassung. Hier bitte die CSV verwenden.',true);
+    return;
+  }
+  toast('Kader wird von sfl.ch geholt…');
+  var h={'content-type':'application/json'};
+  if(apiKey) h['x-sst-key']=apiKey;
+  fetch(API_BASE+'/api/roster',{headers:h,cache:'no-store'}).then(function(r){
+    return r.text().then(function(t){
+      var j=null; try{ j=JSON.parse(t); }catch(e){}
+      return {status:r.status,ok:r.ok,json:j};
+    });
+  }).then(function(r){
+    if(!r.ok||!r.json||!r.json.rows){
+      toast((r.json&&r.json.message)||'sfl.ch konnte nicht abgefragt werden.',true);
+      return;
+    }
+    var parsed={rows:[],unknownPositions:[]}, unknown={};
+    r.json.rows.forEach(function(row){
+      var parts=String(row.position||'').split(/[\/,;|]+/).map(function(x){return fold(x);}).filter(Boolean);
+      var pos=[];
+      parts.forEach(function(x){
+        var hit=ALIAS_LOOKUP[x];
+        if(hit){ if(pos.indexOf(hit)<0) pos.push(hit); }
+        else if(x){ unknown[x]=1; }
+      });
+      parsed.rows.push({name:row.name,team:row.team,pos:pos,raw:row.position||'',
+                        birth:parseBirth(row.birth),photo:row.photo||''});
+    });
+    parsed.unknownPositions=Object.keys(unknown);
+    finishImport(mergeRoster(parsed,'sfl.ch'),true);
+  }).catch(function(){ toast('sfl.ch konnte nicht abgefragt werden.',true); });
+}
+
+/* Gemeinsamer Abschluss für CSV- und Direktimport. */
+function finishImport(merged,fromLeague){
+  var rep=merged.report;
+  var text;
+  if(rep.firstImport){
+    text=rep.added+' Spieler werden geladen.';
+  }else{
+    var bits=[rep.added+' neu', rep.kept+' weiterhin im Kader'];
+    if(rep.gone) bits.push(rep.gone+' nicht mehr in der Liste');
+    if(rep.moved.length) bits.push(rep.moved.length+' mit neuem Klub');
+    text=bits.join(', ')+'. Bestehende Spieler bleiben mit ihren Positionen erhalten, '+
+         'fehlende werden nur markiert und nicht gelöscht.';
+  }
+  confirmBox({
+    title: rep.firstImport?(fromLeague?'Kader laden':'Spielerliste laden'):'Liste abgleichen',
+    text: text,
+    ok: rep.firstImport?'Laden':'Abgleichen'
+  }).then(function(yes){
+    if(!yes) return;
+    var next=clone(STATE);
+    next.pool=merged.pool;
+    commit(next, rep.firstImport
+      ? rep.added+' Spieler geladen'
+      : rep.added+' neu, '+rep.gone+' nicht mehr dabei'
+    ).then(function(ok){
+      if(!ok) return;
+      UI.poolQ=''; UI.poolPos='all'; UI.poolTeam='all';
+      UI.poolScope = rep.added ? 'neu' : (rep.gone ? 'weg' : 'alle');
+      UI.sel={};
+      stashUI(); render();
+      var unknown=merged.pool.unknownPositions;
+      if(unknown && unknown.length){
+        setTimeout(function(){
+          toast('Position nicht erkannt: '+unknown.slice(0,4).join(', ')+(unknown.length>4?' …':''),true);
+        },2200);
+      }
+    });
+  });
+}
+
 function applyCSV(file){
   if(!file) return;
   readFileSmart(file).then(function(txt){
     var parsed=parseRoster(txt);
     if(parsed.error){ toast(parsed.error,true); return; }
-    var merged=mergeRoster(parsed,file.name);
-    var rep=merged.report;
-    var text;
-    if(rep.firstImport){
-      text=rep.added+' Spieler werden geladen.';
-    }else{
-      var bits=[];
-      bits.push(rep.added+' neu');
-      bits.push(rep.kept+' weiterhin im Kader');
-      if(rep.gone) bits.push(rep.gone+' nicht mehr in der Liste');
-      if(rep.moved.length) bits.push(rep.moved.length+' mit neuem Klub');
-      text=bits.join(', ')+'. Bestehende Spieler bleiben mit ihren Positionen erhalten, '+
-           'fehlende werden nur markiert und nicht gelöscht.';
-    }
-    confirmBox({
-      title: rep.firstImport?'Spielerliste laden':'Liste abgleichen',
-      text: text,
-      ok: rep.firstImport?'Laden':'Abgleichen'
-    }).then(function(yes){
-      if(!yes) return;
-      var next=clone(STATE);
-      next.pool=merged.pool;
-      commit(next, rep.firstImport
-        ? rep.added+' Spieler geladen'
-        : rep.added+' neu, '+rep.gone+' nicht mehr dabei'
-      ).then(function(ok){
-        if(!ok) return;
-        UI.poolQ=''; UI.poolPos='all';
-        UI.poolScope = rep.added ? 'neu' : (rep.gone ? 'weg' : 'alle');
-        UI.sel={};
-        stashUI(); render();
-        var unknown=merged.pool.unknownPositions;
-        if(unknown && unknown.length){
-          setTimeout(function(){
-            toast('Position nicht erkannt: '+unknown.slice(0,4).join(', ')+(unknown.length>4?' …':''),true);
-          },2200);
-        }
-      });
-    });
+    finishImport(mergeRoster(parsed,file.name),false);
   }).catch(function(e){ toast((e&&e.message)||'Datei konnte nicht gelesen werden.',true); });
 }
 
@@ -2418,6 +2765,11 @@ function wire(){
     if(act==='copy'){ copyText(consensusText(t.getAttribute('data-p')),'Konsens-Ranking kopiert'); return; }
     if(act==='copy-sample'){ copyText(SAMPLE_CSV,'Beispiel-CSV kopiert'); return; }
     if(act==='pick-file'){ var f=$('#file'); if(f) f.click(); return; }
+    if(act==='league-import'){ importFromLeague(); return; }
+    if(act==='pres'){ openPresentation(t.getAttribute('data-v')||'konsens'); return; }
+    if(act==='pres-close'){ closePresentation(); return; }
+    if(act==='pres-next'){ presStep(1); return; }
+    if(act==='pres-prev'){ presStep(-1); return; }
 
     if(act==='wipe-rankings'){
       confirmBox({title:'Alles in „'+editionLabel(currentEdition())+'" löschen',
@@ -2512,6 +2864,16 @@ function wire(){
     }).catch(function(){ toast('Server nicht erreichbar.',true); });
   });
 
+  /* Bilder feuern kein bubbelndes error-Ereignis — deshalb in der Capture-Phase. */
+  app.addEventListener('error',function(e){
+    var el=e.target;
+    if(!el||el.tagName!=='IMG') return;
+    var box=el.closest&&el.closest('.pfoto');
+    if(!box) return;
+    box.classList.add('empty');
+    box.textContent=box.getAttribute('data-ini')||'?';
+  },true);
+
   app.addEventListener('input',function(e){
     var t=e.target;
     if(t.matches('[data-act="q"]')){ if(EDIT) refreshAC(t); return; }
@@ -2535,6 +2897,13 @@ function wire(){
       e.preventDefault(); AC.open=false; t.value=''; closeAllAC();
       return;
     }
+  });
+
+  document.addEventListener('keydown',function(e){
+    if(!PRES) return;
+    if(e.key==='Escape'){ e.preventDefault(); closePresentation(); return; }
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); presStep(1); return; }
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); presStep(-1); return; }
   });
 
   document.addEventListener('click',function(e){
