@@ -52,6 +52,24 @@ folgt weiterhin dem App-Thema, damit sich beim Arbeiten nichts aufdrängt.
 Schrift: *Big Shoulders Stencil Display* von Google Fonts, mit Barlow Condensed als
 Rückfallebene, falls sie nicht lädt.
 
+## Ranking-Boxen als Beitrag
+
+Jede Tier-Box in der Ranking- und Konsensansicht ist eine fertige Sendungsgrafik:
+Farbbalken oben, Titel „Position – Tier" in Schablonenschrift, die Rangliste, unten das
+Goldband mit dem Logo.
+
+Der Knopf **Als Story** oben rechts an jeder Box zeigt sie einzeln im Hochformat 9:16 —
+gedacht zum Abfotografieren und direkten Posten. Die Spielerbilder werden dort sofort
+geladen, damit keine leeren Kästen im Bildschirmfoto landen. Esc oder *Schliessen* führt
+zurück.
+
+### Logo hinterlegen
+
+Spielerpool → **Sendungslogo** → *Logo wählen*. PNG oder SVG mit durchsichtigem Hintergrund,
+quadratisch, maximal 400 KB. Das Bild wird als Data-URI im Zustand abgelegt und erscheint in
+der Fusszeile jeder Box — eingebettet, weil das Artifact keine fremden Bildadressen lädt.
+Ohne eigenes Logo steht dort ein Schriftzug als Platzhalter.
+
 ## Rankings und Veränderung
 
 Jedes Ranking ist ein eigener, vollständiger Stand. Beim Anlegen lassen sich die Eingaben

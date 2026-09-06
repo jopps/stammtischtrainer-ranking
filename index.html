@@ -169,7 +169,7 @@ h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;text-wrap:b
 
 /* ---------- tier board ---------- */
 .board{display:grid;gap:14px;padding:20px 0 40px}
-@media (min-width:1000px){.board.cols{grid-template-columns:repeat(3,1fr);align-items:start}}
+@media (min-width:1000px){.board.cols{align-items:start}}
 .tier{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
 .tier-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line-soft);
   border-left:4px solid var(--tc,var(--line))}
@@ -611,6 +611,64 @@ pre.code{background:var(--panel-2);border:1px solid var(--line);border-radius:va
   .scname,.sage{font-size:12.5px}
   .tier.showstyle .tier-head h3{font-size:19px}
 }
+/* ---------- Ranking-Box als fertige Sendungsgrafik ---------- */
+.storycard{position:relative;background:var(--show-cream);border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;isolation:isolate}
+.sc-bar{display:flex;height:12px;flex:0 0 auto}
+.sc-bar i{display:block;height:100%}
+.sc-bar .b1{width:32%;background:var(--show-navy)}
+.sc-bar .b2{width:35%;background:var(--rank-a)}
+.sc-bar .b3{width:33%;background:var(--rank-b)}
+.sc-title{font-family:var(--stencil);font-weight:700;color:var(--show-navy);text-align:center;
+  text-transform:uppercase;font-size:30px;line-height:1.04;letter-spacing:.01em;padding:22px 18px 18px}
+.sc-body{padding:0 14px 14px;flex:1}
+.sc-body .slist{padding:0}
+.sc-body .empty{color:var(--show-mute);padding:14px 4px}
+.sc-foot{position:relative;height:96px;flex:0 0 auto;overflow:hidden}
+.sc-diag{position:absolute;left:-10%;right:-10%;bottom:-42px;height:74px;background:var(--rank-a);
+  transform:rotate(-6deg);opacity:.85}
+.sc-badge{position:absolute;right:16px;bottom:12px;width:74px;height:74px;border-radius:50%;
+  background:var(--show-row);border:2px solid var(--show-navy);display:grid;place-items:center;
+  overflow:hidden;padding:5px}
+.sc-badge img{width:100%;height:100%;object-fit:contain}
+.sc-word{display:flex;flex-direction:column;align-items:center;line-height:.98;text-align:center}
+.sc-word i{font-style:normal;font-family:var(--stencil);font-weight:600;font-size:9px;
+  text-transform:uppercase;color:var(--rank-b);letter-spacing:.06em}
+.sc-word b{font-family:var(--stencil);font-weight:700;font-size:12px;text-transform:uppercase;
+  color:var(--show-navy);letter-spacing:.01em}
+.sc-word em{font-style:normal;font-family:var(--stencil);font-weight:700;font-size:13px;
+  text-transform:uppercase;color:var(--rank-b);letter-spacing:.01em}
+.sc-word.small b{font-size:11px} .sc-word.small em{font-size:12px}
+.sc-cap{position:absolute;top:20px;right:12px;z-index:2;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--show-mute);background:var(--show-row);
+  border:1px solid var(--show-line);border-radius:99px;padding:3px 9px}
+.sc-cap:hover{color:var(--show-navy);border-color:var(--show-navy)}
+.logoprev{width:64px;height:64px;border-radius:50%;background:var(--show-row);border:2px solid var(--show-navy);
+  display:grid;place-items:center;overflow:hidden;padding:4px;flex:0 0 auto}
+.logoprev img{width:100%;height:100%;object-fit:contain}
+
+/* im normalen Raster etwas breitere Karten, damit die Boxen wirken */
+.board.cols{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+
+/* ---------- Story-Vollbild zum Abfotografieren ---------- */
+.storywrap{position:fixed;inset:0;z-index:72;background:var(--bg);display:flex;flex-direction:column}
+.storybar{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.sb-txt{font-family:var(--display);font-weight:700;font-size:19px;text-transform:uppercase}
+.sb-sp{flex:1}
+.sb-hint{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.storystage{flex:1;min-height:0;overflow:auto;display:flex;justify-content:center;padding:20px}
+.storycard.tall{width:min(430px,92vw);aspect-ratio:9/16;border-radius:0;box-shadow:var(--shadow-lg);
+  align-self:flex-start}
+.storycard.tall .sc-title{font-size:clamp(26px,6.4vw,40px);padding:26px 20px 20px}
+.storycard.tall .sc-body{padding:0 16px}
+.storycard.tall .sc-foot{height:120px}
+.storycard.tall .sc-badge{width:92px;height:92px;right:20px;bottom:16px}
+@media (max-width:600px){
+  .sc-title{font-size:24px;padding:16px 12px 13px}
+  .sc-foot{height:76px}
+  .sc-badge{width:60px;height:60px}
+  .storystage{padding:12px}
+}
 .gate{display:grid;place-items:center;min-height:78vh;padding:24px 0}
 .gatebox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);
   padding:30px 28px;max-width:400px;width:100%;text-align:center}
@@ -931,6 +989,7 @@ function migrate(st){
   if(!Array.isArray(st.pool.players)) st.pool.players=[];
   if(!Array.isArray(st.pool.imports)) st.pool.imports=[];
   if(!st.rankings||typeof st.rankings!=='object') st.rankings={};
+  if(!st.brand||typeof st.brand!=='object') st.brand={logo:null};
 
   if(!st.v||st.v<2){
     /* Spieler-IDs von name~team auf name umstellen */
@@ -1800,15 +1859,38 @@ function renderLineup(){
 /* ============================================================
    Rendering — Positionsansicht
    ============================================================ */
-function tierPanel(tierId,inner,countLabel,show){
+function tierPanel(tierId,inner,countLabel,show,posId){
   var t=TIER_BY_ID[tierId];
-  return '<section class="tier t-'+t.id+(show?' showstyle':'')+'" data-tier="'+t.id+'">'+
-    '<div class="tier-head"><span class="tbadge">'+t.abbr+'</span><h3>'+esc(t.name)+'</h3>'+
-    '<span class="n">'+countLabel+'</span></div>'+inner+'</section>';
+  if(!show){
+    return '<section class="tier t-'+t.id+'" data-tier="'+t.id+'">'+
+      '<div class="tier-head"><span class="tbadge">'+t.abbr+'</span><h3>'+esc(t.name)+'</h3>'+
+      '<span class="n">'+countLabel+'</span></div>'+inner+'</section>';
+  }
+  var pos=POS_BY_ID[posId];
+  return '<section class="storycard t-'+t.id+'" data-tier="'+t.id+'">'+
+    storyBar()+
+    '<div class="sc-title">'+(pos?esc(pos.name)+' –<br>':'')+esc(t.name)+'</div>'+
+    '<div class="sc-body">'+inner+'</div>'+
+    storyFoot()+
+    '<button class="sc-cap" data-act="story" data-p="'+esc(posId||'')+'" data-t="'+t.id+'" '+
+      'title="Gross anzeigen zum Abfotografieren">Als Story</button>'+
+  '</section>';
+}
+function storyBar(){
+  return '<div class="sc-bar"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>';
+}
+/* Fusszeile: eigenes Logo, sonst ein Textabzeichen in derselben Anmutung. */
+function storyFoot(){
+  var logo=(STATE.brand&&STATE.brand.logo)||null;
+  var badge=logo
+    ? '<img src="'+esc(logo)+'" alt="">'
+    : '<span class="sc-word"><i>Die</i><b>Stammtisch</b><em>Trainer</em></span>';
+  return '<div class="sc-foot"><span class="sc-diag"></span><span class="sc-badge">'+badge+'</span></div>';
 }
 
 /* Zeile im Look der Sendungsgrafik: Rangkachel mit der Veränderung darunter,
    daneben Bild, Name in Schablonenschrift, darunter Wappen, Klub und Alter. */
+var EAGER_PHOTOS=false;   /* in der Story-Ansicht sofort laden, nicht erst beim Scrollen */
 function showRow(p,flatIx,total,delta,extra){
   var live=inPool(p.id);
   var missing=poolPlayers().length&&!live;
@@ -1817,7 +1899,7 @@ function showRow(p,flatIx,total,delta,extra){
   return '<li class="srow">'+
     '<span class="srank">'+rankBox(flatIx,total)+showDelta(delta)+'</span>'+
     '<span class="sbody">'+
-      playerPhoto(p,'sq')+
+      playerPhoto(p,'sq',EAGER_PHOTOS)+
       '<span class="stxt">'+
         '<b>'+esc(p.name)+'</b>'+
         '<span class="sclub">'+teamMark(m.team)+
@@ -1877,7 +1959,7 @@ function renderHostRanking(posId,hostId){
     var inner=list.length
       ? '<ul class="slist">'+list.map(function(p){ flatIx++; return showRow(p,flatIx,total,deltaFor(prevRanks,p.id,flatIx)); }).join('')+'</ul>'
       : '<div class="empty">Kein Spieler in diesem Tier.</div>';
-    h+=tierPanel(t.id,inner,list.length+'',true);
+    h+=tierPanel(t.id,inner,list.length+'',true,posId);
   });
   h+='</div>';
   h+=droppedBlock(posId,hostId);
@@ -1982,7 +2064,7 @@ function renderConsensus(posId){
       }).join('');
       return showRow(rec,flatIx,total,dl,'<span class="votes">'+votes+'</span>');
     }).join('')+'</ul>':'<div class="empty">Kein Spieler in diesem Tier.</div>';
-    h+=tierPanel(t.id,inner,list.length+'',true);
+    h+=tierPanel(t.id,inner,list.length+'',true,posId);
   });
   h+='</div>';
   h+=droppedBlock(posId,'konsens');
@@ -2127,6 +2209,47 @@ function renderPresentation(){
       '<span class="pres-hint">Pfeiltasten oder Leertaste · Esc schliesst</span>'+
       '<button class="btn pri" data-act="pres-next"'+(PRES.ix>=PRES.steps.length-1?' disabled':'')+'>Weiter →</button>'+
     '</div>'+
+  '</div>';
+}
+
+/* Eine einzelne Box im Hochformat, damit sie sich sauber abfotografieren
+   und als Beitrag verwenden lässt. */
+var STORY=null;   /* {pos,tier,view} */
+
+function renderStory(){
+  var posId=STORY.pos, tierId=STORY.tier, view=STORY.view;
+  var list, prevRanks=previousFlat(posId,view), total, flatIx=0, startAt=0;
+  if(view==='konsens'){
+    var g=consensus(posId);
+    total=TIERS.reduce(function(n,t){return n+g[t.id].length;},0);
+    TIERS.forEach(function(t){ if(t.id!==tierId) { if(TIERS.indexOf(t)<TIERS.indexOf(TIER_BY_ID[tierId])) startAt+=g[t.id].length; } });
+    list=g[tierId];
+  }else{
+    var e=getEntryIn(STATE.currentEditionId,posId,view);
+    if(!e) return '<div class="storywrap"><p>Kein Ranking vorhanden.</p></div>';
+    total=countEntry(e);
+    TIERS.forEach(function(t){ if(TIERS.indexOf(t)<TIERS.indexOf(TIER_BY_ID[tierId])) startAt+=(e.tiers[t.id]||[]).length; });
+    list=e.tiers[tierId]||[];
+  }
+  flatIx=startAt;
+  EAGER_PHOTOS=true;
+  var rows=list.map(function(p){ flatIx++; return showRow(p,flatIx,total,deltaFor(prevRanks,p.id,flatIx)); }).join('');
+  EAGER_PHOTOS=false;
+  var pos=POS_BY_ID[posId], t=TIER_BY_ID[tierId];
+  return '<div class="storywrap">'+
+    '<div class="storybar">'+
+      '<span class="sb-txt">'+esc(pos.name)+' · '+esc(t.name)+' · '+
+        esc(view==='konsens'?'Konsens':HOST_BY_ID[view].name)+'</span>'+
+      '<span class="sb-sp"></span>'+
+      '<span class="sb-hint">Bildschirmfoto der Karte machen</span>'+
+      '<button class="btn sm" data-act="story-close">Schliessen</button>'+
+    '</div>'+
+    '<div class="storystage"><section class="storycard tall t-'+t.id+'">'+
+      storyBar()+
+      '<div class="sc-title">'+esc(pos.name)+' –<br>'+esc(t.name)+'</div>'+
+      '<div class="sc-body">'+(rows?'<ul class="slist">'+rows+'</ul>':'<div class="empty">Kein Spieler in diesem Tier.</div>')+'</div>'+
+      storyFoot()+
+    '</section></div>'+
   '</div>';
 }
 
@@ -2287,6 +2410,19 @@ function renderPool(){
     '<div style="margin-top:14px;display:flex;gap:9px;flex-wrap:wrap">'+
       '<button class="btn dgr" data-act="wipe-rankings"'+(anyRanking?'':' disabled')+'>Alle Rankings löschen</button>'+
       '<button class="btn dgr" data-act="wipe-pool">Spielerliste löschen</button>'+
+    '</div></div>';
+
+  h+='<div class="panel"><h2>Sendungslogo</h2>'+
+    '<p class="d">Erscheint in der Fusszeile jeder Ranking-Box. PNG oder SVG mit '+
+    'durchsichtigem Hintergrund, am besten quadratisch. Ohne eigenes Logo steht dort '+
+    'ein Schriftzug als Platzhalter.</p>'+
+    '<div style="margin-top:14px;display:flex;gap:11px;align-items:center;flex-wrap:wrap">'+
+      '<span class="logoprev">'+((STATE.brand&&STATE.brand.logo)
+        ?'<img src="'+esc(STATE.brand.logo)+'" alt="">'
+        :'<span class="sc-word small"><i>Die</i><b>Stammtisch</b><em>Trainer</em></span>')+'</span>'+
+      '<input type="file" id="logofile" accept="image/png,image/svg+xml,image/jpeg,image/webp" class="sr">'+
+      '<button class="btn" data-act="pick-logo">Logo wählen</button>'+
+      ((STATE.brand&&STATE.brand.logo)?'<button class="btn dgr sm" data-act="drop-logo">Entfernen</button>':'')+
     '</div></div>';
 
   /* ---- Speicherleiste ---- */
@@ -2459,6 +2595,7 @@ function render(){
     return;
   }
   if(PRES){ app.innerHTML=renderPresentation(); preloadAhead(); return; }
+  if(STORY){ app.innerHTML=renderStory(); return; }
   var body = UI.view==='pool' ? renderPool()
            : UI.view==='editions' ? renderEditions()
            : UI.view==='position' ? renderPosition()
@@ -2630,6 +2767,22 @@ function finishImport(merged,fromLeague){
       }
     });
   });
+}
+
+/* Das Logo wandert als Data-URI in den Zustand — im Artifact sind fremde
+   Bildadressen gesperrt, eingebettet funktioniert es überall. */
+function applyLogo(file){
+  if(!file) return;
+  if(file.size>400*1024){ toast('Logo zu gross (max. 400 KB). Bitte verkleinern.',true); return; }
+  var fr=new FileReader();
+  fr.onerror=function(){ toast('Datei konnte nicht gelesen werden.',true); };
+  fr.onload=function(){
+    var next=baseNext();
+    next.brand=next.brand||{};
+    next.brand.logo=String(fr.result||'');
+    commit(next,'Logo gespeichert');
+  };
+  fr.readAsDataURL(file);
 }
 
 function applyCSV(file){
@@ -2849,6 +3002,17 @@ function wire(){
     if(act==='copy-sample'){ copyText(SAMPLE_CSV,'Beispiel-CSV kopiert'); return; }
     if(act==='pick-file'){ var f=$('#file'); if(f) f.click(); return; }
     if(act==='league-import'){ importFromLeague(); return; }
+    if(act==='pick-logo'){ var lf=$('#logofile'); if(lf) lf.click(); return; }
+    if(act==='drop-logo'){
+      var nx=baseNext(); nx.brand=nx.brand||{}; nx.brand.logo=null;
+      commit(nx,'Logo entfernt'); return;
+    }
+    if(act==='story'){
+      STORY={pos:t.getAttribute('data-p'),tier:t.getAttribute('data-t'),
+             view:(UI.tab==='konsens'?'konsens':UI.tab)};
+      render(); return;
+    }
+    if(act==='story-close'){ STORY=null; render(); return; }
     if(act==='pres'){ openPresentation(t.getAttribute('data-v')||'konsens'); return; }
     if(act==='pres-close'){ closePresentation(); return; }
     if(act==='pres-next'){ presStep(1); return; }
@@ -2968,6 +3132,7 @@ function wire(){
     if(t.matches('[data-act="edsel"]')){ switchEdition(t.value); return; }
     if(t.matches('[data-act="poolteam"]')){ UI.poolTeam=t.value; clearSel(); stashUI(); render(); return; }
     if(t.id==='file'){ applyCSV(t.files&&t.files[0]); t.value=''; return; }
+    if(t.id==='logofile'){ applyLogo(t.files&&t.files[0]); t.value=''; return; }
   });
 
   app.addEventListener('keydown',function(e){
